@@ -5,13 +5,7 @@
 
 #include "../../src/fpmd.h"
 
-int add(int a, int b) {
-    return a - b;
-}
-
 int main() {
-
-
     char *input = "Line 1  \
                    Line 2";
 

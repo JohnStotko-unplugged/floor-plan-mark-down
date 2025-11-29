@@ -1,7 +1,7 @@
 TARGET = prog.out
 LIBS = -lm
 CC = gcc
-CFLAGS = -g -Wall -Werror -pedantic
+CFLAGS = -g -Wall -Werror -pedantic -std=c90
 SRC = src
 BIN = bin
 OBJ = obj

@@ -1,3 +1,11 @@
+//
+//
+//
+//
+//
+//
+//
+
 #include <stdio.h>
 
 const int TEST_SUCCESS = 0;
@@ -12,6 +20,6 @@ int test_failed(const char* message)
 
 int test_passed()
 {
-    printf("PASSED");
+    printf("PASSED\n");
     return TEST_SUCCESS;
 }
