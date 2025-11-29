@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "fpmd.h"
+
 const char *VERSION = "1.0.0";
 
 void printVersion()
@@ -48,6 +50,8 @@ int main(int argc, char *argv[])
             return 1;
         }
     }
+
+    fpmd_convert(fp, stdout);
     
     if (fp != stdin)
 		(void)fclose(fp);
