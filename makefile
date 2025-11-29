@@ -56,6 +56,6 @@ test: $(BIN)/$(TARGET)
 .PHONY: clean
 
 clean:
-	-rm -f *.o
+	-rm -f $(OBJ)/*.o
 	-rm -f $(BIN)/$(TARGET)
 	-rm -f $(TESTS)/output*.txt
