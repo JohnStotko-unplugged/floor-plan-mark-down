@@ -68,12 +68,13 @@ unit-tests: $(UNIT_TEST_EXECS)
 	@passCount=0; failCount=0; totalCount=0;\
     for test_exec in $(UNIT_TEST_EXECS); do \
         totalCount=$$((totalCount + 1)); \
-        echo "Running $$test_exec..."; \
+        echo -n "Running $$test_exec... "; \
         if $$test_exec; then \
             passCount=$$((passCount + 1)); \
         else \
             failCount=$$((failCount + 1)); \
         fi; \
+		echo ""; \
     done; \
     echo "Unit tests completed. Total: $$totalCount, Passed: $$passCount, Failed: $$failCount."
 

@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "test.h"
+
 #include "../../src/fpmd.h"
 
 int add(int a, int b) {
@@ -19,19 +21,16 @@ int main() {
     fpmd_tokenizer_init(&tokenizer, in);
 
     if(tokenizer.currentToken.tokenType != NONE) {
-        printf("Test failed: token type should be initialized to None\n");
-        return 1;
+        return test_failed("token type should be initialized to None");
     }
 
     if(tokenizer.currentToken.start != -1) {
-        printf("Test failed: token start should be initialized to -1\n");
-        return 1;
+        return test_failed("token start should be initialized to -1");
     }
 
     if(tokenizer.currentToken.length != -1) {
-        printf("Test failed: token length should be initialized to -1\n");
-        return 1;
+        return test_failed("token length should be initialized to -1");
     }
 
-    return 0;
+    return test_passed();
 }
