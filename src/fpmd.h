@@ -10,16 +10,16 @@ Module FPBM - FloorPlan MarkDown
 #include <stdbool.h>
 
 
-typedef enum FPMD_TOKEN_TYPE{
+enum FPMD_TOKEN_TYPE{
     NONE,
     NEWLINE,
     INDENTION,
     NUMBER,
     TEXT
-} FPMD_TOKEN_TYPE;
+};
 
 struct FPMD_Token{
-    FPMD_TOKEN_TYPE tokenType;
+    enum FPMD_TOKEN_TYPE tokenType;
     int start ;
     int length ;
 };
