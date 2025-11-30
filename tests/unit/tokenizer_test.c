@@ -5,9 +5,13 @@
 
 #include "../../src/fpmd.h"
 
-int main() {
+
+int tokenizer_initialization_test()
+{
+    report_test_start("tokenizer_initialization_test");
+
     char *input = "Line 1  \
-                   Line 2";
+                Line 2";
 
     FILE* in = fmemopen(input, strlen(input), "r");
 
@@ -27,4 +31,12 @@ int main() {
     }
 
     return test_passed();
+}
+
+int main() {
+    int result = TEST_SUCCESS;
+
+    result |= tokenizer_initialization_test();
+
+    return result;
 }
