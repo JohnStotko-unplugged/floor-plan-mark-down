@@ -63,7 +63,6 @@ int tokenizer_next_token_two_texts()
     report_test_start("tokenizer_next_token_two_texts");
 
     char *input = "one two";
-
     FILE* in = fmemopen(input, strlen(input), "r");
 
     struct FPMD_Tokenizer tokenizer;
@@ -90,49 +89,209 @@ int tokenizer_next_token_two_texts()
 int tokenizer_next_token_number()
 {
     report_test_start("tokenizer_next_token_number");
-    return test_todo();
+
+    char *input = "123";
+    FILE* in = fmemopen(input, strlen(input), "r");
+
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, in);
+
+    if(!fpmd_tokenizer_next(&tokenizer)) {
+        return test_failed("expected to read next token");
+    }
+
+    if(tokenizer.currentToken.tokenType != NUMBER) {
+        return test_failed("expected token type NUMBER");
+    }
+
+    int bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer[bufferSize];
+
+    fpmd_token_value(&tokenizer, buffer, bufferSize);
+
+    if(strcmp(buffer, "123") != 0) {
+        return test_failed("expected token value '123'");
+    }
+
+    return test_passed();
 }
 
 int tokenizer_next_token_a1_is_valid_text()
 {
     report_test_start("tokenizer_next_token_a1_is_valid_text");
-    return test_todo();
+
+    char *input = "a1";
+    FILE* in = fmemopen(input, strlen(input), "r");
+
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, in);
+
+    if(!fpmd_tokenizer_next(&tokenizer)) {
+        return test_failed("expected to read next token");
+    }
+
+    if(tokenizer.currentToken.tokenType != TEXT) {
+        return test_failed("expected token type TEXT");
+    }
+
+    int bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer[bufferSize];
+
+    fpmd_token_value(&tokenizer, buffer, bufferSize);
+
+    if(strcmp(buffer, "a1") != 0) {
+        return test_failed("expected token value 'a1'");
+    }
+
+    return test_passed();
 }
 
 int tokenizer_next_token_1a_is_valid_text()
 {
     report_test_start("tokenizer_next_token_1a_is_valid_text");
-    return test_todo();
+
+    char *input = "1a";
+    FILE* in = fmemopen(input, strlen(input), "r");
+
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, in);
+
+    if(!fpmd_tokenizer_next(&tokenizer)) {
+        return test_failed("expected to read next token");
+    }
+
+    if(tokenizer.currentToken.tokenType != TEXT) {
+        return test_failed("expected token type TEXT");
+    }
+
+    int bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer[bufferSize];
+
+    fpmd_token_value(&tokenizer, buffer, bufferSize);
+
+    if(strcmp(buffer, "1a") != 0) {
+        return test_failed("expected token value '1a'");
+    }
+
+    return test_passed();
 }
 
 int tokenizer_next_token_quotes()
 {
     report_test_start("tokenizer_next_token_quotes");
-    return test_todo();
+
+    char *input = "'I like spaces'";
+    FILE* in = fmemopen(input, strlen(input), "r");
+
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, in);
+
+    if(!fpmd_tokenizer_next(&tokenizer)) {
+        return test_failed("expected to read next token");
+    }
+
+    if(tokenizer.currentToken.tokenType != TEXT) {
+        return test_failed("expected token type TEXT");
+    }
+
+    int bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer[bufferSize];
+
+    fpmd_token_value(&tokenizer, buffer, bufferSize);
+
+    if(strcmp(buffer, "I like spaces") != 0) {
+        return test_failed("expected token value 'I like spaces'");
+    }
+
+    return test_passed();
 }
 
 int tokenizer_next_token_indent()
 {
     report_test_start("tokenizer_next_token_indent");
-    return test_todo();
-}
 
-int tokenizer_next_token_newline()
-{
-    report_test_start("tokenizer_next_token_newline");
-    return test_todo();
+    char *input = "  ";
+    FILE* in = fmemopen(input, strlen(input), "r");
+
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, in);
+
+    if(!fpmd_tokenizer_next(&tokenizer)) {
+        return test_failed("expected to read next token");
+    }
+
+    if(tokenizer.currentToken.tokenType != INDENTION) {
+        return test_failed("expected token type INDENTION");
+    }
+
+    return test_passed();
 }
 
 int tokenizer_next_token_multiple_indent()
 {
     report_test_start("tokenizer_next_token_multiple_indent");
-    return test_todo();
+
+    char *input = "    ";
+    FILE* in = fmemopen(input, strlen(input), "r");
+
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, in);
+
+    fpmd_tokenizer_next(&tokenizer);
+
+    if(!fpmd_tokenizer_next(&tokenizer)) {
+        return test_failed("expected to read next token");
+    }
+
+    if(tokenizer.currentToken.tokenType != INDENTION) {
+        return test_failed("expected token type INDENTION");
+    }
+
+    return test_passed();
+}
+
+int tokenizer_next_token_newline()
+{
+    report_test_start("tokenizer_next_token_newline");
+
+    char *input = "\n";
+    FILE* in = fmemopen(input, strlen(input), "r");
+
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, in);
+
+    if(!fpmd_tokenizer_next(&tokenizer)) {
+        return test_failed("expected to read next token");
+    }
+
+    if(tokenizer.currentToken.tokenType != NEWLINE) {
+        return test_failed("expected token type NEWLINE");
+    }
+
+    return test_passed();
 }
 
 int tokenizer_next_token_multiple_newline()
 {
     report_test_start("tokenizer_next_token_eof");
-    return test_todo();
+
+    char *input = "\n\n";
+    FILE* in = fmemopen(input, strlen(input), "r");
+
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, in);
+
+    fpmd_tokenizer_next(&tokenizer);
+
+    if(!fpmd_tokenizer_next(&tokenizer)) {
+        return test_failed("expected to read next token");
+    }
+
+    if(tokenizer.currentToken.tokenType != NEWLINE) {
+        return test_failed("expected token type NEWLINE");
+    }
+
+    return test_passed();
 }
 
 int main() {
@@ -145,6 +304,10 @@ int main() {
     result |= tokenizer_next_token_a1_is_valid_text();
     result |= tokenizer_next_token_1a_is_valid_text();
     result |= tokenizer_next_token_quotes();
+    result |= tokenizer_next_token_indent();
+    result |= tokenizer_next_token_multiple_indent();
+    result |= tokenizer_next_token_newline();
+    result |= tokenizer_next_token_multiple_newline();
 
     return result;
 }
