@@ -14,6 +14,7 @@ const int TEST_FAILURE = 1;
 const char* COLOR_NORMAL = "\x1B[0m";
 const char* COLOR_RED = "\x1B[31m";
 const char* COLOR_GREEN = "\x1B[32m";
+const char* COLOR_MAGENTA = "\x1B[35m";
 
 void report_test_start(const char* test_name)
 {
@@ -30,5 +31,11 @@ int test_failed(const char* message)
 int test_passed()
 {
     printf("%sPASSED%s\n", COLOR_GREEN, COLOR_NORMAL);
+    return TEST_SUCCESS;
+}
+
+int test_todo(const char* message)
+{
+    printf("%sTO-DO%s\n", COLOR_MAGENTA, COLOR_NORMAL);
     return TEST_SUCCESS;
 }
