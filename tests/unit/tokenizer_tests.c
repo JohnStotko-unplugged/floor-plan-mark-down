@@ -48,6 +48,7 @@ int tokenizer_next_token_test()
     }
 
     if(tokenizer.currentToken.start != 0) {
+        printf("Got start: %d\n", tokenizer.currentToken.start);
         return test_failed("expected token start 0");
     }
 

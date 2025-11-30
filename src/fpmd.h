@@ -44,8 +44,43 @@ void fpmd_tokenizer_init(struct FPMD_Tokenizer* tokenizer, FILE* input)
     tokenizer->currentToken = fpmd_token_init();
 }
 
+bool fpmd_tokenizer_isvalidtextchar(int c)
+{
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+}
+
 bool fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 {
+    int c;
+
+    do{
+        c = fgetc(tokenizer->input);
+
+        if(fpmd_tokenizer_isvalidtextchar(c))
+        {
+            tokenizer->currentToken.tokenType = TEXT;
+            tokenizer->currentToken.start = ftell(tokenizer->input) - 1;
+            tokenizer->currentToken.length = 1;
+
+            while(true)
+            {
+                c = fgetc(tokenizer->input);
+                if(fpmd_tokenizer_isvalidtextchar(c))
+                {
+                    tokenizer->currentToken.length += 1;
+                }
+                else
+                {
+                    ungetc(c, tokenizer->input);
+                    break;
+                }
+            }
+
+            return true;
+        }
+
+    } while (c != EOF);
+
     return false;
 }
 
