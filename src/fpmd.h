@@ -84,6 +84,32 @@ bool fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
     return false;
 }
 
+const int TOKEN_VALUE_ERROR_BUFFER_TOO_SMALL = -1;
+const int TOKEN_VALUE_ERROR_INVALID_TOKEN_TYPE = -2;
+const int TOKEN_VALUE_SUCCESS = 0;
+
+int fpmp_token_buffersize(struct FPMD_Tokenizer* tokenizer)
+{
+    return tokenizer->currentToken.length + 1;
+}
+
+int fpmd_token_value(struct FPMD_Tokenizer* tokenizer, char buffer[], int buffer_size)
+{
+    if(tokenizer->currentToken.tokenType != TEXT && tokenizer->currentToken.tokenType != NUMBER) {
+        return TOKEN_VALUE_ERROR_INVALID_TOKEN_TYPE;
+    }
+
+    if(buffer_size < fpmp_token_buffersize(tokenizer)) {
+        return TOKEN_VALUE_ERROR_BUFFER_TOO_SMALL;
+    }
+
+    fseek(tokenizer->input, tokenizer->currentToken.start, SEEK_SET);
+    fread(buffer, sizeof(char), tokenizer->currentToken.length, tokenizer->input);
+    buffer[tokenizer->currentToken.length] = '\0';
+
+    return TOKEN_VALUE_SUCCESS;
+}
+
 void fpmd_convert(FILE* input, FILE* output)
 {
 

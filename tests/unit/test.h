@@ -24,7 +24,7 @@ void report_test_start(const char* test_name)
 int test_failed(const char* message)
 {
     printf("%sFAILED%s\n", COLOR_RED, COLOR_NORMAL);
-    printf("        %sERROR:%s %s", COLOR_RED, COLOR_NORMAL, message);
+    printf("        %sERROR:%s %s\n", COLOR_RED, COLOR_NORMAL, message);
     return TEST_FAILURE;
 }
 

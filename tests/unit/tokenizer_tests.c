@@ -33,7 +33,6 @@ int tokenizer_next_token_test()
     report_test_start("tokenizer_next_token_test");
 
     char *input = "line";
-
     FILE* in = fmemopen(input, strlen(input), "r");
 
     struct FPMD_Tokenizer tokenizer;
@@ -47,12 +46,13 @@ int tokenizer_next_token_test()
         return test_failed("expected token type TEXT");
     }
 
-    if(tokenizer.currentToken.start != 0) {
-        return test_failed("expected token start 0");
-    }
+    int bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer[bufferSize];
 
-    if(tokenizer.currentToken.length != 4) {
-        return test_failed("expected token length 4");
+    fpmd_token_value(&tokenizer, buffer, bufferSize);
+
+    if(strcmp(buffer, "line") != 0) {
+        return test_failed("expected token value 'line'");
     }
 
     return test_passed();
@@ -60,7 +60,7 @@ int tokenizer_next_token_test()
 
 int tokenizer_next_token_two_texts()
 {
-        report_test_start("tokenizer_next_token_two_texts");
+    report_test_start("tokenizer_next_token_two_texts");
 
     char *input = "one two";
 
@@ -75,16 +75,13 @@ int tokenizer_next_token_two_texts()
         return test_failed("expected to read next token");
     }
 
-    if(tokenizer.currentToken.tokenType != TEXT) {
-        return test_failed("expected token type TEXT");
-    }
+    int bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer[bufferSize];
 
-    if(tokenizer.currentToken.start != 4) {
-        return test_failed("expected token start 4");
-    }
+    fpmd_token_value(&tokenizer, buffer, bufferSize);
 
-    if(tokenizer.currentToken.length != 3) {
-        return test_failed("expected token length 3");
+    if(strcmp(buffer, "two") != 0) {
+        return test_failed("expected token value 'two'");
     }
 
     return test_passed();
@@ -146,7 +143,7 @@ int main() {
     result |= tokenizer_next_token_two_texts();
     result |= tokenizer_next_token_number();
     result |= tokenizer_next_token_a1_is_valid_text();
-    result |= tokenizer_next_token_1a_is_not_valid();
+    result |= tokenizer_next_token_1a_is_valid_text();
     result |= tokenizer_next_token_quotes();
 
     return result;
