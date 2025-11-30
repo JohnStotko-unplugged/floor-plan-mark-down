@@ -33,25 +33,7 @@ $(BIN)/$(TARGET): $(OBJECTS)
 	$(CC) $(OBJECTS) -Wall $(LIBS) -o $@
 
 ###########################################################################
-# E2E TESTS
-###########################################################################
-
-.PHONY: test
-
-test: $(BIN)/$(TARGET)
-	@echo "Running tests..."
-	@for input in $(wildcard $(TESTS)/input*.txt); do \
-        num=$$(echo $$input | sed 's/.*input\([0-9]*\).txt/\1/'); \
-        output="$(TESTS)/output$${num}.txt"; \
-        ./$(BIN)/$(TARGET) < $$input > $$output || (echo "program failed"; exit 1); \
-        expected="$(TESTS)/expected$${num}.txt"; \
-        echo "Comparing $$output to $$expected..."; \
-        diff -u $$expected $$output || (echo "Test $$num failed"; exit 1); \
-    done
-	@echo "All tests passed."
-
-###########################################################################
-# UNIT TESTS
+# TEST
 ###########################################################################
 
 UNIT_TEST_FOLDER = tests/unit
@@ -63,7 +45,7 @@ $(UNIT_TEST_FOLDER)/bin/%.out: $(UNIT_TEST_FOLDER)/%.c
 	@ mkdir -p $(UNIT_TEST_FOLDER)/bin
 	$(CC) $(CFLAGS) $< -o $@ $(LIBS)
 
-unit-tests: $(UNIT_TEST_EXECS)
+test: $(UNIT_TEST_EXECS)
 	@echo "Running tests..."
 	@passCount=0; failCount=0; totalCount=0;\
     for test_exec in $(UNIT_TEST_EXECS); do \
