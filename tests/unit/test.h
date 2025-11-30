@@ -34,7 +34,7 @@ int test_passed()
     return TEST_SUCCESS;
 }
 
-int test_todo(const char* message)
+int test_todo()
 {
     printf("%sTO-DO%s\n", COLOR_MAGENTA, COLOR_NORMAL);
     return TEST_SUCCESS;
