@@ -10,6 +10,11 @@ Module FPBM - FloorPlan MarkDown
 #include <stdbool.h>
 
 
+//############################################################################
+//# START OF TOKENIZATION
+//############################################################################
+
+
 enum FPMD_TOKEN_TYPE{
     NONE,
     NEWLINE,
@@ -23,6 +28,14 @@ struct FPMD_Token{
     int start ;
     int length ;
 };
+
+enum FPMD_Tokenizer_State{
+    STATE_NEWLINE,
+    STATE_INDENTION_IN_PROGRESS,
+    STATE_TEXT_IN_PROGRESS,
+    STATE_QUOTED_TEXT_IN_PROGRESS,
+    STATE_SEARCH_FOR_NEXT_TOKEN
+}
 
 struct FPMD_Tokenizer{
     FILE* input;
@@ -109,6 +122,12 @@ int fpmd_token_value(struct FPMD_Tokenizer* tokenizer, char buffer[], int buffer
 
     return TOKEN_VALUE_SUCCESS;
 }
+
+
+//############################################################################
+//# END OF TOKENIZATION
+//############################################################################
+
 
 void fpmd_convert(FILE* input, FILE* output)
 {
