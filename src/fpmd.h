@@ -41,6 +41,7 @@ enum FPMD_Tokenizer_State{
 struct FPMD_Tokenizer{
     FILE* input;
     enum FPMD_Tokenizer_State state;
+    enum FPMD_Tokenizer_State previousState;
     struct FPMD_Token currentToken;
 };
 
@@ -57,6 +58,7 @@ void fpmd_tokenizer_init(struct FPMD_Tokenizer* tokenizer, FILE* input)
 {
     tokenizer->input = input;
     tokenizer->state = STATE_NEWLINE;
+    tokenizer->previousState = STATE_NEWLINE;
     tokenizer->currentToken = fpmd_token_init();
 }
 
@@ -167,6 +169,7 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
 
 void fpmb_tokenizer_move_next_state( struct FPMD_Tokenizer* tokenizer, int c)
 {
+    tokenizer->previousState = tokenizer->state;
     tokenizer->state = fpmb_tokenizer_get_next_state(tokenizer, c);
 }
 
@@ -176,14 +179,12 @@ bool fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 
     int c;
     //char buffer[TOKEN_BUFFER_SIZE];
-
+    //int bufferPosition = 0;
     do{
         c = fgetc(tokenizer->input);
 
         fpmb_tokenizer_move_next_state(tokenizer, c);
         
-
-
         if(tokenizer->state == STATE_ERROR)
         {
             return false;
