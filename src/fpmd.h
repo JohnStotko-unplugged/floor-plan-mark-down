@@ -34,11 +34,13 @@ enum FPMD_Tokenizer_State{
     STATE_INDENTION_IN_PROGRESS,
     STATE_TEXT_IN_PROGRESS,
     STATE_QUOTED_TEXT_IN_PROGRESS,
-    STATE_SEARCH_FOR_NEXT_TOKEN
-}
+    STATE_SEARCH_FOR_NEXT_TOKEN,
+    STATE_ERROR
+};
 
 struct FPMD_Tokenizer{
     FILE* input;
+    enum FPMD_Tokenizer_State state;
     struct FPMD_Token currentToken;
 };
 
@@ -54,6 +56,7 @@ struct FPMD_Token fpmd_token_init()
 void fpmd_tokenizer_init(struct FPMD_Tokenizer* tokenizer, FILE* input)
 {
     tokenizer->input = input;
+    tokenizer->state = STATE_NEWLINE;
     tokenizer->currentToken = fpmd_token_init();
 }
 
@@ -62,35 +65,133 @@ bool fpmd_tokenizer_isvalidtextchar(int c)
     return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 }
 
+bool fpmd_tokenizer_is_text(int c)
+{
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_';
+}
+
+bool fpmd_tokenizer_is_qtext(int c)
+{
+    return c != '\'' && c != '\n';
+}
+
+bool fpmd_tokenizer_is_space(int c)
+{
+    return c == ' ';
+}
+
+bool fpmd_tokenizer_is_singlequote(int c)
+{
+    return c == '\'';   
+}
+
+bool fpmd_tokenizer_is_newline(int c)
+{
+    return c == '\n';
+}
+
+enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokenizer* tokenizer, int c)
+{
+    switch(tokenizer->state)
+    {
+        case STATE_NEWLINE:
+            if(fpmd_tokenizer_is_space(c))
+            {
+                return STATE_INDENTION_IN_PROGRESS;
+            }
+            else if(fpmd_tokenizer_is_text(c))
+            {
+                return STATE_TEXT_IN_PROGRESS;
+            }
+            else if(fpmd_tokenizer_is_singlequote(c))
+            {
+                return STATE_QUOTED_TEXT_IN_PROGRESS;
+            }
+            else if(fpmd_tokenizer_is_newline(c))
+            {
+                return STATE_NEWLINE;
+            }
+            else
+            {
+                return STATE_ERROR;
+            }
+            break;
+
+        case STATE_INDENTION_IN_PROGRESS:
+            if(fpmd_tokenizer_is_space(c))
+            {
+                return STATE_INDENTION_IN_PROGRESS;
+            }
+            else 
+            {
+                return STATE_ERROR;
+            }
+            break;
+
+        case STATE_TEXT_IN_PROGRESS:
+            if(fpmd_tokenizer_is_text(c))
+            {
+                return STATE_TEXT_IN_PROGRESS;
+            }
+            else if (fpmd_tokenizer_is_space(c) || fpmd_tokenizer_is_newline(c))
+            {
+                return STATE_SEARCH_FOR_NEXT_TOKEN;
+            }
+            else{
+                return STATE_ERROR;
+            }
+            break;
+
+        case STATE_QUOTED_TEXT_IN_PROGRESS:
+            if(fpmd_tokenizer_is_qtext(c))
+            {
+                return STATE_QUOTED_TEXT_IN_PROGRESS;
+            }
+            else if(fpmd_tokenizer_is_singlequote(c))
+            {
+                return STATE_SEARCH_FOR_NEXT_TOKEN;
+            }
+            else
+            {
+                return STATE_ERROR;
+            }
+            break;
+
+        default:
+            break;
+    }
+
+    return STATE_SEARCH_FOR_NEXT_TOKEN;
+ 
+}
+
+void fpmb_tokenizer_move_next_state( struct FPMD_Tokenizer* tokenizer, int c)
+{
+    tokenizer->state = fpmb_tokenizer_get_next_state(tokenizer, c);
+}
+
 bool fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 {
+    //const int TOKEN_BUFFER_SIZE = 256;
+
     int c;
+    //char buffer[TOKEN_BUFFER_SIZE];
 
     do{
         c = fgetc(tokenizer->input);
 
-        if(fpmd_tokenizer_isvalidtextchar(c))
+        fpmb_tokenizer_move_next_state(tokenizer, c);
+        
+
+
+        if(tokenizer->state == STATE_ERROR)
         {
-            tokenizer->currentToken.tokenType = TEXT;
-            tokenizer->currentToken.start = ftell(tokenizer->input) - 1;
-            tokenizer->currentToken.length = 1;
-
-            while(true)
-            {
-                c = fgetc(tokenizer->input);
-                if(fpmd_tokenizer_isvalidtextchar(c))
-                {
-                    tokenizer->currentToken.length += 1;
-                }
-                else
-                {
-                    ungetc(c, tokenizer->input);
-                    break;
-                }
-            }
-
-            return true;
+            return false;
         }
+
+        
+
+
 
     } while (c != EOF);
 

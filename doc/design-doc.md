@@ -1,4 +1,10 @@
 
+## Steps
+
+```mermaid
+flowchart LR
+    Tokenize --> Tree --> Draw
+```
 
 
 
