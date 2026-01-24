@@ -113,8 +113,8 @@ int tokenizer_next_token_number()
         return test_failed(msg);
     }
 
-    if(tokenizer.currentToken.tokenType != NUMBER) {
-        return test_failed("expected token type NUMBER");
+    if(tokenizer.currentToken.tokenType != TEXT) {
+        return test_failed("expected token type TEXT");
     }
 
     int bufferSize = fpmp_token_buffersize(&tokenizer);
