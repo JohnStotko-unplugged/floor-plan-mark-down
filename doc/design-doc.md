@@ -50,3 +50,18 @@ stateDiagram-v2
     quoted_ip_if_state --> STATE_QUOTED_TEXT_IN_PROGRESS: q-text
     quoted_ip_if_state --> STATE_SEARCH_FOR_NEXT_TOKEN: single quote
 ```
+
+
+
+# Rethinking things to follow an established pattern
+
+The initial steps of parsing raw text into something that is structured is a standard compiler implemtation does. Let's see if we can borrow from common compiler design to help this flow better.
+
+- Lexical Analysis: Done by a `lexer`. Tokenizes source code into meaningful units (tokens).
+- Syntax Analysis: Done by a `parser`. Parses tokens into a `syntax tree` based on grammer rules.
+- Semantic Analysis: Done by a `???`. Ensures correctness of meaning.
+
+See [Basics of Compiler Design | Torben Ægidius Mogensen](https://hjemmesider.diku.dk/~torbenm/Basics/basics_lulu2.pdf), section 1.2 The phases of a compiler.
+
+On the semantic analysis, flipping through the [GCC source code on GitHub](https://github.com/gcc-mirror/gcc), I found that many languages had parsers and lexers, but there wasn't a consistant name for a semantic analyser. Instead, they have specific semantic analyzers - for example a type checker.
+
