@@ -305,7 +305,14 @@ int tokenizer_next_token_multiple_indent()
 
     fpmd_tokenizer_next(&tokenizer);
 
+        //print token info
+    printf("Token Type: %d, Start: %d, Length: %d\n", tokenizer.currentToken.tokenType, tokenizer.currentToken.start, tokenizer.currentToken.length);
+
     int ret = fpmd_tokenizer_next(&tokenizer);
+
+    //print token info
+    printf("Token Type: %d, Start: %d, Length: %d\n", tokenizer.currentToken.tokenType, tokenizer.currentToken.start, tokenizer.currentToken.length);
+
     if(ret != 1) {
         char msg[256];
         sprintf(msg, "expected to read next token, but got error code %d", ret);

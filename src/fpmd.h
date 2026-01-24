@@ -40,9 +40,11 @@ struct FPMD_Token{
 enum FPMD_Tokenizer_State{
     STATE_EOF,
     STATE_NEWLINE,
+    STATE_QUOTED_TEXT_START,
     STATE_INDENTION_IN_PROGRESS,
     STATE_TEXT_IN_PROGRESS,
     STATE_QUOTED_TEXT_IN_PROGRESS,
+    STATE_INDENTION_FINISH, 
     STATE_SEARCH_FOR_NEXT_TOKEN,
     STATE_ERROR
 };
@@ -106,6 +108,7 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
     switch(tokenizer->state)
     {
         case STATE_NEWLINE:
+        case STATE_INDENTION_FINISH:
             if(fpmd_tokenizer_is_space(c))
             {
                 return STATE_INDENTION_IN_PROGRESS;
@@ -116,7 +119,7 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
             }
             else if(fpmd_tokenizer_is_singlequote(c))
             {
-                return STATE_QUOTED_TEXT_IN_PROGRESS;
+                return STATE_QUOTED_TEXT_START;
             }
             else if(fpmd_tokenizer_is_newline(c))
             {
@@ -132,7 +135,7 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
         case STATE_INDENTION_IN_PROGRESS:
             if(fpmd_tokenizer_is_space(c))
             {
-                return STATE_INDENTION_IN_PROGRESS;
+                return STATE_INDENTION_FINISH;
             }
             else 
             {
@@ -153,6 +156,21 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
             else{
                 *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_TEXT;
                 return STATE_EOF;
+            }
+            break;
+        case STATE_QUOTED_TEXT_START:
+            if(fpmd_tokenizer_is_qtext(c))
+            {
+                return STATE_QUOTED_TEXT_IN_PROGRESS;
+            }
+            else if(fpmd_tokenizer_is_singlequote(c))
+            {
+                return STATE_SEARCH_FOR_NEXT_TOKEN;
+            }
+            else
+            {
+                *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_QUOTED_TEXT;
+                return STATE_ERROR;
             }
             break;
 
@@ -208,6 +226,19 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             return error; // TODO return error code
         }
 
+        if(tokenizer->state == STATE_INDENTION_FINISH)
+        {
+            tokenizer->currentToken.tokenType = INDENTION;
+            tokenizer->currentToken.length += 1;
+            return true;
+        }
+
+        if(tokenizer->state == STATE_QUOTED_TEXT_START)
+        {
+            // Skip starting quote
+            tokenizer->currentToken.start += 1;
+        }
+
         if(tokenizer->state == STATE_NEWLINE)
         {
             tokenizer->currentToken.tokenType = NEWLINE;
@@ -238,16 +269,13 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             {
                 return true;
             }
-            else{
-                tokenizer->currentToken.start++;
-            }
         }
 
 
     } while (c != EOF );
 
-    if(tokenizer->previousState == STATE_INDENTION_IN_PROGRESS
-    || tokenizer->previousState == STATE_TEXT_IN_PROGRESS)
+    if(tokenizer->previousState == STATE_TEXT_IN_PROGRESS
+    || tokenizer->previousState == STATE_INDENTION_IN_PROGRESS)
     {
         return true; // if quoted test not closed, error should be raised
     }
