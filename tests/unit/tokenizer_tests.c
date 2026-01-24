@@ -38,8 +38,11 @@ int tokenizer_next_token_test()
     struct FPMD_Tokenizer tokenizer;
     fpmd_tokenizer_init(&tokenizer, in);
 
-    if(!fpmd_tokenizer_next(&tokenizer)) {
-        return test_failed("expected to read next token");
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
     }
 
     if(tokenizer.currentToken.tokenType != TEXT) {
@@ -70,8 +73,11 @@ int tokenizer_next_token_two_texts()
 
     fpmd_tokenizer_next(&tokenizer);
 
-    if(!fpmd_tokenizer_next(&tokenizer)) {
-        return test_failed("expected to read next token");
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
     }
 
     int bufferSize = fpmp_token_buffersize(&tokenizer);
@@ -96,8 +102,11 @@ int tokenizer_next_token_number()
     struct FPMD_Tokenizer tokenizer;
     fpmd_tokenizer_init(&tokenizer, in);
 
-    if(!fpmd_tokenizer_next(&tokenizer)) {
-        return test_failed("expected to read next token");
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
     }
 
     if(tokenizer.currentToken.tokenType != NUMBER) {
@@ -126,8 +135,11 @@ int tokenizer_next_token_a1_is_valid_text()
     struct FPMD_Tokenizer tokenizer;
     fpmd_tokenizer_init(&tokenizer, in);
 
-    if(!fpmd_tokenizer_next(&tokenizer)) {
-        return test_failed("expected to read next token");
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
     }
 
     if(tokenizer.currentToken.tokenType != TEXT) {
@@ -156,8 +168,11 @@ int tokenizer_next_token_1a_is_valid_text()
     struct FPMD_Tokenizer tokenizer;
     fpmd_tokenizer_init(&tokenizer, in);
 
-    if(!fpmd_tokenizer_next(&tokenizer)) {
-        return test_failed("expected to read next token");
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
     }
 
     if(tokenizer.currentToken.tokenType != TEXT) {
@@ -186,8 +201,11 @@ int tokenizer_next_token_quotes()
     struct FPMD_Tokenizer tokenizer;
     fpmd_tokenizer_init(&tokenizer, in);
 
-    if(!fpmd_tokenizer_next(&tokenizer)) {
-        return test_failed("expected to read next token");
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
     }
 
     if(tokenizer.currentToken.tokenType != TEXT) {
@@ -216,8 +234,11 @@ int tokenizer_next_token_indent()
     struct FPMD_Tokenizer tokenizer;
     fpmd_tokenizer_init(&tokenizer, in);
 
-    if(!fpmd_tokenizer_next(&tokenizer)) {
-        return test_failed("expected to read next token");
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
     }
 
     if(tokenizer.currentToken.tokenType != INDENTION) {
@@ -239,8 +260,11 @@ int tokenizer_next_token_multiple_indent()
 
     fpmd_tokenizer_next(&tokenizer);
 
-    if(!fpmd_tokenizer_next(&tokenizer)) {
-        return test_failed("expected to read next token");
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
     }
 
     if(tokenizer.currentToken.tokenType != INDENTION) {
@@ -260,8 +284,11 @@ int tokenizer_next_token_newline()
     struct FPMD_Tokenizer tokenizer;
     fpmd_tokenizer_init(&tokenizer, in);
 
-    if(!fpmd_tokenizer_next(&tokenizer)) {
-        return test_failed("expected to read next token");
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
     }
 
     if(tokenizer.currentToken.tokenType != NEWLINE) {
@@ -283,8 +310,11 @@ int tokenizer_next_token_multiple_newline()
 
     fpmd_tokenizer_next(&tokenizer);
 
-    if(!fpmd_tokenizer_next(&tokenizer)) {
-        return test_failed("expected to read next token");
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
     }
 
     if(tokenizer.currentToken.tokenType != NEWLINE) {

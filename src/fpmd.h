@@ -9,6 +9,14 @@ Module FPBM - FloorPlan MarkDown
 #include <stdio.h>
 #include <stdbool.h>
 
+//############################################################################
+//# START OF ERRORS
+//############################################################################
+
+const int FPMD_TOKENIZER_ERROR_EXPECTED_WHITESPACE = -100;
+const int FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_NEWLINE = -101;
+const int FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_TEXT = -102;
+const int FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_QUOTED_TEXT = -103;
 
 //############################################################################
 //# START OF TOKENIZATION
@@ -30,6 +38,7 @@ struct FPMD_Token{
 };
 
 enum FPMD_Tokenizer_State{
+    STATE_EOF,
     STATE_NEWLINE,
     STATE_INDENTION_IN_PROGRESS,
     STATE_TEXT_IN_PROGRESS,
@@ -92,7 +101,7 @@ bool fpmd_tokenizer_is_newline(int c)
     return c == '\n';
 }
 
-enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokenizer* tokenizer, int c)
+enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokenizer* tokenizer, int c, int* error)
 {
     switch(tokenizer->state)
     {
@@ -115,7 +124,8 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
             }
             else
             {
-                return STATE_ERROR;
+                *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_NEWLINE;
+                return STATE_EOF;
             }
             break;
 
@@ -126,6 +136,7 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
             }
             else 
             {
+                *error = FPMD_TOKENIZER_ERROR_EXPECTED_WHITESPACE;
                 return STATE_ERROR;
             }
             break;
@@ -140,7 +151,8 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
                 return STATE_SEARCH_FOR_NEXT_TOKEN;
             }
             else{
-                return STATE_ERROR;
+                *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_TEXT;
+                return STATE_EOF;
             }
             break;
 
@@ -155,6 +167,7 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
             }
             else
             {
+                *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_QUOTED_TEXT;
                 return STATE_ERROR;
             }
             break;
@@ -167,14 +180,18 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
  
 }
 
-void fpmb_tokenizer_move_next_state( struct FPMD_Tokenizer* tokenizer, int c)
+void fpmb_tokenizer_move_next_state( struct FPMD_Tokenizer* tokenizer, int c, int* error)
 {
     tokenizer->previousState = tokenizer->state;
-    tokenizer->state = fpmb_tokenizer_get_next_state(tokenizer, c);
+    tokenizer->state = fpmb_tokenizer_get_next_state(tokenizer, c, error);
 }
 
-bool fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
+int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 {
+    // Assume that this is the start of a new token
+    tokenizer->currentToken.start = ftell(tokenizer->input) - 1;
+    tokenizer->currentToken.length = 0;
+
     //const int TOKEN_BUFFER_SIZE = 256;
 
     int c;
@@ -182,19 +199,55 @@ bool fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
     //int bufferPosition = 0;
     do{
         c = fgetc(tokenizer->input);
-
-        fpmb_tokenizer_move_next_state(tokenizer, c);
         
+        int error = 0;
+        fpmb_tokenizer_move_next_state(tokenizer, c, &error);
+
         if(tokenizer->state == STATE_ERROR)
         {
-            return false;
+            return error; // TODO return error code
         }
 
-        
+        if(tokenizer->state == STATE_NEWLINE)
+        {
+            tokenizer->currentToken.tokenType = NEWLINE;
+            tokenizer->currentToken.length += 1;
+            return true;
+        }
+        else if(tokenizer->state == STATE_INDENTION_IN_PROGRESS)
+        {
+            tokenizer->currentToken.tokenType = INDENTION;
+            tokenizer->currentToken.length += 1;
+        }
+        else if(tokenizer->state == STATE_TEXT_IN_PROGRESS)
+        {
+            tokenizer->currentToken.tokenType = TEXT;
+            tokenizer->currentToken.length += 1;
+        }
+        else if(tokenizer->state == STATE_QUOTED_TEXT_IN_PROGRESS)
+        {
+            tokenizer->currentToken.tokenType = TEXT;
+            tokenizer->currentToken.length += 1;
+        }
+        else if(tokenizer->state == STATE_SEARCH_FOR_NEXT_TOKEN)
+        {
+            // Finalize token
+            if(tokenizer->previousState == STATE_INDENTION_IN_PROGRESS
+            || tokenizer->previousState == STATE_TEXT_IN_PROGRESS
+            || tokenizer->previousState == STATE_QUOTED_TEXT_IN_PROGRESS)
+            {
+                return true;
+            }
+        }
 
 
+    } while (c != EOF );
 
-    } while (c != EOF);
+    if(tokenizer->previousState == STATE_INDENTION_IN_PROGRESS
+    || tokenizer->previousState == STATE_TEXT_IN_PROGRESS)
+    {
+        return true; // if quoted test not closed, error should be raised
+    }
 
     return false;
 }
