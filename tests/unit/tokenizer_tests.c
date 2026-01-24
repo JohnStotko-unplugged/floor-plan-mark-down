@@ -76,6 +76,7 @@ int tokenizer_next_token_two_texts()
     fpmd_tokenizer_next(&tokenizer);
 
     int ret = fpmd_tokenizer_next(&tokenizer);
+
     if(ret != 1) {
         char msg[256];
         sprintf(msg, "expected to read next token, but got error code %d", ret);
@@ -96,9 +97,9 @@ int tokenizer_next_token_two_texts()
     return test_passed();
 }
 
-int tokenizer_next_token_two_texts_more_space()
+int tokenizer_next_token_two_texts_space()
 {
-    report_test_start("tokenizer_next_token_two_texts_more_space");
+    report_test_start("tokenizer_next_token_two_texts_space");
 
     char *input = "one    two";
     FILE* in = fmemopen(input, strlen(input), "r");
@@ -109,6 +110,7 @@ int tokenizer_next_token_two_texts_more_space()
     fpmd_tokenizer_next(&tokenizer);
 
     int ret = fpmd_tokenizer_next(&tokenizer);
+
     if(ret != 1) {
         char msg[256];
         sprintf(msg, "expected to read next token, but got error code %d", ret);
@@ -376,7 +378,7 @@ int main() {
     result |= tokenizer_initialization_test();
     result |= tokenizer_next_token_test();
     result |= tokenizer_next_token_two_texts();
-    result |= tokenizer_next_token_two_texts_more_space();
+    result |= tokenizer_next_token_two_texts_space();
     result |= tokenizer_next_token_number();
     result |= tokenizer_next_token_a1_is_valid_text();
     result |= tokenizer_next_token_1a_is_valid_text();

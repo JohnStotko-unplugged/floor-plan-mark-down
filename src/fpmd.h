@@ -131,7 +131,29 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
                 return STATE_EOF;
             }
             break;
-
+        case STATE_SEARCH_FOR_NEXT_TOKEN:
+            if(fpmd_tokenizer_is_space(c))
+            {
+                return STATE_SEARCH_FOR_NEXT_TOKEN;
+            }
+            else if(fpmd_tokenizer_is_text(c))
+            {
+                return STATE_TEXT_IN_PROGRESS;
+            }
+            else if(fpmd_tokenizer_is_singlequote(c))
+            {
+                return STATE_QUOTED_TEXT_START;
+            }
+            else if(fpmd_tokenizer_is_newline(c))
+            {
+                return STATE_NEWLINE;
+            }
+            else
+            {
+                *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_NEWLINE;
+                return STATE_EOF;
+            }
+            break;
         case STATE_INDENTION_IN_PROGRESS:
             if(fpmd_tokenizer_is_space(c))
             {
@@ -143,7 +165,6 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
                 return STATE_ERROR;
             }
             break;
-
         case STATE_TEXT_IN_PROGRESS:
             if(fpmd_tokenizer_is_text(c))
             {
@@ -268,6 +289,11 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             || tokenizer->previousState == STATE_QUOTED_TEXT_IN_PROGRESS)
             {
                 return true;
+            }
+            else{
+                // Continue searching for next token
+                tokenizer->currentToken.start = ftell(tokenizer->input);
+                tokenizer->currentToken.length = 0;
             }
         }
 
