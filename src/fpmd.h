@@ -238,6 +238,9 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             {
                 return true;
             }
+            else{
+                tokenizer->currentToken.start++;
+            }
         }
 
 

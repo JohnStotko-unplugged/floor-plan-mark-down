@@ -96,6 +96,39 @@ int tokenizer_next_token_two_texts()
     return test_passed();
 }
 
+int tokenizer_next_token_two_texts_more_space()
+{
+    report_test_start("tokenizer_next_token_two_texts_more_space");
+
+    char *input = "one    two";
+    FILE* in = fmemopen(input, strlen(input), "r");
+
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, in);
+
+    fpmd_tokenizer_next(&tokenizer);
+
+    int ret = fpmd_tokenizer_next(&tokenizer);
+    if(ret != 1) {
+        char msg[256];
+        sprintf(msg, "expected to read next token, but got error code %d", ret);
+        return test_failed(msg);
+    }
+
+    int bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer[bufferSize];
+
+    fpmd_token_value(&tokenizer, buffer, bufferSize);
+
+    if(strcmp(buffer, "two") != 0) {
+        char msg[256];
+        sprintf(msg, "expected token value 'two', but got '%s'", buffer);
+        return test_failed(msg);
+    }
+
+    return test_passed();
+}
+
 int tokenizer_next_token_number()
 {
     report_test_start("tokenizer_next_token_number");
@@ -342,6 +375,7 @@ int main() {
     result |= tokenizer_initialization_test();
     result |= tokenizer_next_token_test();
     result |= tokenizer_next_token_two_texts();
+    result |= tokenizer_next_token_two_texts_more_space();
     result |= tokenizer_next_token_number();
     result |= tokenizer_next_token_a1_is_valid_text();
     result |= tokenizer_next_token_1a_is_valid_text();
