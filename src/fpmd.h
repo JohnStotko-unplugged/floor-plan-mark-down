@@ -189,7 +189,7 @@ void fpmb_tokenizer_move_next_state( struct FPMD_Tokenizer* tokenizer, int c, in
 int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 {
     // Assume that this is the start of a new token
-    tokenizer->currentToken.start = ftell(tokenizer->input) - 1;
+    tokenizer->currentToken.start = ftell(tokenizer->input);
     tokenizer->currentToken.length = 0;
 
     //const int TOKEN_BUFFER_SIZE = 256;
