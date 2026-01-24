@@ -55,7 +55,9 @@ int tokenizer_next_token_test()
     fpmd_token_value(&tokenizer, buffer, bufferSize);
 
     if(strcmp(buffer, "line") != 0) {
-        return test_failed("expected token value 'line'");
+        char msg[256];
+        sprintf(msg, "expected token value 'line', but got '%s'", buffer);
+        return test_failed(msg);
     }
 
     return test_passed();
@@ -86,7 +88,9 @@ int tokenizer_next_token_two_texts()
     fpmd_token_value(&tokenizer, buffer, bufferSize);
 
     if(strcmp(buffer, "two") != 0) {
-        return test_failed("expected token value 'two'");
+        char msg[256];
+        sprintf(msg, "expected token value 'two', but got '%s'", buffer);
+        return test_failed(msg);
     }
 
     return test_passed();
@@ -119,7 +123,9 @@ int tokenizer_next_token_number()
     fpmd_token_value(&tokenizer, buffer, bufferSize);
 
     if(strcmp(buffer, "123") != 0) {
-        return test_failed("expected token value '123'");
+        char msg[256];
+        sprintf(msg, "expected token value '123', but got '%s'", buffer);
+        return test_failed(msg);
     }
 
     return test_passed();
@@ -152,7 +158,9 @@ int tokenizer_next_token_a1_is_valid_text()
     fpmd_token_value(&tokenizer, buffer, bufferSize);
 
     if(strcmp(buffer, "a1") != 0) {
-        return test_failed("expected token value 'a1'");
+        char msg[256];
+        sprintf(msg, "expected token value 'a1', but got '%s'", buffer);
+        return test_failed(msg);
     }
 
     return test_passed();
@@ -185,7 +193,9 @@ int tokenizer_next_token_1a_is_valid_text()
     fpmd_token_value(&tokenizer, buffer, bufferSize);
 
     if(strcmp(buffer, "1a") != 0) {
-        return test_failed("expected token value '1a'");
+        char msg[256];
+        sprintf(msg, "expected token value '1a', but got '%s'", buffer);
+        return test_failed(msg);
     }
 
     return test_passed();
@@ -218,7 +228,9 @@ int tokenizer_next_token_quotes()
     fpmd_token_value(&tokenizer, buffer, bufferSize);
 
     if(strcmp(buffer, "I like spaces") != 0) {
-        return test_failed("expected token value 'I like spaces'");
+        char msg[256];
+        sprintf(msg, "expected token value 'I like spaces', but got '%s'", buffer);
+        return test_failed(msg);
     }
 
     return test_passed();
