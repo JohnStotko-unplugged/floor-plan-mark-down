@@ -62,6 +62,14 @@ test: $(UNIT_TEST_EXECS)
 
 ###########################################################################
 
+perf: $(UNIT_TEST_EXECS)
+	@echo "Running perf stat on unit tests..."
+	@for test_exec in $(UNIT_TEST_EXECS); do \
+        echo "Profiling $$test_exec"; \
+        perf stat $$test_exec; \
+        echo ""; \
+    done
+
 
 
 .PHONY: clean
