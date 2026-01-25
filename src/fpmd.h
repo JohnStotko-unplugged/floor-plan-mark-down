@@ -340,6 +340,44 @@ int fpmd_token_value(struct FPMD_Tokenizer* tokenizer, char buffer[], int buffer
 //# END OF TOKENIZATION
 //############################################################################
 
+//############################################################################
+//# BEGIN OF Parser
+//############################################################################
+
+
+
+struct FPMD_Parser{
+  struct FPMD_Tokenizer tokenizer;
+}
+
+// Rather than constructing the tree in memory, we will provide functions to traverse the tree directly from the file.
+
+// Get Next Item
+// gets the next item in the syntax tree. 
+// If return value is 0, then no item was retrieved, indicating end of items or an error.
+// if error is 0, no error occurred.
+// If an item is retrieved, it becomes the current item for subsequent calls to Get Next Row and Get Next Data.
+// Calling Get Next Item while reading rows or data will skip to the next item.
+
+// Get Next Row
+// progress to the next row in the parent item. 
+// If return value is 0, then no data was retrieved, indicating end of row or an error.
+// if error is 0, no error occurred.
+// If an row is retrieved, it becomes the current row for subsequent calls to Get Next Data.
+// Calling Get Next Row while reading data will skip to the next row.
+
+// Get Next Data
+// gets the next data entry for the current row. 
+// If return value is 0, then no data was retrieved, indicating end of row or an error.
+// if error is 0, no error occurred.
+
+//############################################################################
+//# END OF Parser
+//############################################################################
+
+
+
+
 
 void fpmd_convert(FILE* input, FILE* output)
 {

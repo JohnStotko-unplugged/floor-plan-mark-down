@@ -69,19 +69,21 @@ On the semantic analysis, flipping through the [GCC source code on GitHub](https
 Let's take this all as an example:
 
 ```
-wall
+wall interior
   0 0
   door 1 4 bifold in
   6 0
 ```
 Tokenized, this would be
 
-`wall`, `newline`, `indent`, `0`, `0`, `newline`, `indent`, `door`, `1`, `4`, `bifold` `in`, `newline`, `indent`, `6`, `0`
+`wall`, `interior`, `newline`, `indent`, `0`, `0`, `newline`, `indent`, `door`, `1`, `4`, `bifold` `in`, `newline`, `indent`, `6`, `0`
 
 The syntax tree for this would be
 
 ```mermaid
 graph TD
+    wall --> flavor[flavor]
+    flavor --> interior
     wall --> row1[row]
     wall --> row2[row]
     wall --> row3[row]
@@ -95,5 +97,7 @@ graph TD
     row3 --> n5[6]
     row3 --> n6[0]
 ```
+
+Each top-level item is treated as its own tree. 
 
 
