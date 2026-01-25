@@ -1,4 +1,3 @@
-
 ## Steps
 
 ```mermaid
@@ -64,4 +63,37 @@ The initial steps of parsing raw text into something that is structured is a sta
 See [Basics of Compiler Design | Torben Ægidius Mogensen](https://hjemmesider.diku.dk/~torbenm/Basics/basics_lulu2.pdf), section 1.2 The phases of a compiler.
 
 On the semantic analysis, flipping through the [GCC source code on GitHub](https://github.com/gcc-mirror/gcc), I found that many languages had parsers and lexers, but there wasn't a consistant name for a semantic analyser. Instead, they have specific semantic analyzers - for example a type checker.
+
+## Tree Structure Example
+
+Let's take this all as an example:
+
+```
+wall
+  0 0
+  door 1 4 bifold in
+  6 0
+```
+Tokenized, this would be
+
+`wall`, `newline`, `indent`, `0`, `0`, `newline`, `indent`, `door`, `1`, `4`, `bifold` `in`, `newline`, `indent`, `6`, `0`
+
+The syntax tree for this would be
+
+```mermaid
+graph TD
+    wall --> row1[row]
+    wall --> row2[row]
+    wall --> row3[row]
+    row1 --> n1[0]
+    row1 --> n2[0]
+    row2 --> door[door]
+    row2 --> n3[1]
+    row2 --> n4[4]
+    row2 --> bifold
+    row2 --> in
+    row3 --> n5[6]
+    row3 --> n6[0]
+```
+
 
