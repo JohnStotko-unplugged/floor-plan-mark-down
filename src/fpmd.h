@@ -348,7 +348,7 @@ int fpmd_token_value(struct FPMD_Tokenizer* tokenizer, char buffer[], int buffer
 
 struct FPMD_Parser{
   struct FPMD_Tokenizer tokenizer;
-}
+};
 
 // Rather than constructing the tree in memory, we will provide functions to traverse the tree directly from the file.
 
