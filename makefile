@@ -20,7 +20,7 @@ all: default
 OBJECTS = $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(wildcard $(SRC)/*.c))
 
 # All the header files
-HEADERS = $(wildcard *.h)
+HEADERS = $(wildcard $(SRC)/*.h)
 
 $(OBJ)/%.o: $(SRC)/%.c $(HEADERS)
 	@ mkdir -p $(OBJ)
@@ -41,7 +41,7 @@ UNIT_TESTS_FILES =  $(wildcard $(UNIT_TEST_FOLDER)/*.c)
 UNIT_TEST_OBJECTS = $(patsubst $(UNIT_TEST_FOLDER)/%.c, $(UNIT_TEST_FOLDER)/obj/%.o, $(UNIT_TESTS_FILES))
 UNIT_TEST_EXECS = $(patsubst $(UNIT_TEST_FOLDER)/%.c, $(UNIT_TEST_FOLDER)/bin/%.out, $(UNIT_TESTS_FILES))
 
-$(UNIT_TEST_FOLDER)/bin/%.out: $(UNIT_TEST_FOLDER)/%.c
+$(UNIT_TEST_FOLDER)/bin/%.out: $(UNIT_TEST_FOLDER)/%.c $(HEADERS)
 	@ mkdir -p $(UNIT_TEST_FOLDER)/bin
 	$(CC) $(CFLAGS) $< -o $@ $(LIBS)
 
@@ -67,7 +67,7 @@ SAMPLE_TEST_FILES =  $(wildcard $(SAMPLE_TEST_FOLDER)/*.c)
 SAMPLE_TEST_OBJECTS = $(patsubst $(SAMPLE_TEST_FOLDER)/%.c, $(SAMPLE_TEST_FOLDER)/obj/%.o, $(SAMPLE_TEST_FILES))
 SAMPLE_TEST_EXECS = $(patsubst $(SAMPLE_TEST_FOLDER)/%.c, $(SAMPLE_TEST_FOLDER)/bin/%.out, $(SAMPLE_TEST_FILES))
 
-$(SAMPLE_TEST_FOLDER)/bin/%.out: $(SAMPLE_TEST_FOLDER)/%.c
+$(SAMPLE_TEST_FOLDER)/bin/%.out: $(SAMPLE_TEST_FOLDER)/%.c $(HEADERS)
 	@ mkdir -p $(SAMPLE_TEST_FOLDER)/bin
 	$(CC) $(CFLAGS) $< -o $@ $(LIBS)
 
