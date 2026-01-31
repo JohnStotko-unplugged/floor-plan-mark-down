@@ -21,10 +21,9 @@ int main() {
         //    break;
         //}
 
-        int bufferSize = tokenizer.currentToken.length + 1;
-        char buffer[bufferSize];
+        char buffer[FPMD_MAX_TOKEN_LENGTH];
 
-        fpmd_token_value(&tokenizer, buffer, bufferSize);
+        fpmd_token_value(&tokenizer, buffer, FPMD_MAX_TOKEN_LENGTH);
 
         printf("Token Type: %d, Value: '%s'\n", tokenizer.currentToken.tokenType, buffer);
 

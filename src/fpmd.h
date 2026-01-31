@@ -19,6 +19,12 @@ const int FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_TEXT = -102;
 const int FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_QUOTED_TEXT = -103;
 
 //############################################################################
+//# START OF CONSTANTS
+//############################################################################
+
+const int FPMD_MAX_TOKEN_LENGTH = 64;
+
+//############################################################################
 //# START OF TOKENIZATION
 //############################################################################
 
