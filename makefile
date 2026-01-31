@@ -62,16 +62,7 @@ test: $(UNIT_TEST_EXECS)
 
 ###########################################################################
 
-SAMPLE_TEST_FOLDER = tests/samples
-SAMPLE_TEST_FILES =  $(wildcard $(SAMPLE_TEST_FOLDER)/*.c)
-SAMPLE_TEST_OBJECTS = $(patsubst $(SAMPLE_TEST_FOLDER)/%.c, $(SAMPLE_TEST_FOLDER)/obj/%.o, $(SAMPLE_TEST_FILES))
-SAMPLE_TEST_EXECS = $(patsubst $(SAMPLE_TEST_FOLDER)/%.c, $(SAMPLE_TEST_FOLDER)/bin/%.out, $(SAMPLE_TEST_FILES))
-
-$(SAMPLE_TEST_FOLDER)/bin/%.out: $(SAMPLE_TEST_FOLDER)/%.c $(HEADERS)
-	@ mkdir -p $(SAMPLE_TEST_FOLDER)/bin
-	$(CC) $(CFLAGS) $< -o $@ $(LIBS)
-
-sample: $(SAMPLE_TEST_EXECS)
+sample: $(BIN)/$(TARGET)
 	@echo "Running sample tests..."
 	@cat samples/example1/example1.md | bin/fpmd -t
 	echo "Sample tests completed."
@@ -86,5 +77,3 @@ clean:
 	-rm -f $(TESTS)/output*.txt
 	-rm -f $(UNIT_TEST_FOLDER)/bin/*.out
 	-rm -f $(UNIT_TEST_FOLDER)/obj/*.o
-	-rm -f $(SAMPLE_TEST_FOLDER)/bin/*.out
-	-rm -f $(SAMPLE_TEST_FOLDER)/obj/*.o
