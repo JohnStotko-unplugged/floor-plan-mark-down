@@ -326,9 +326,33 @@ int fpmp_token_buffersize(struct FPMD_Tokenizer* tokenizer)
 
 int fpmd_token_value(struct FPMD_Tokenizer* tokenizer, char buffer[], int buffer_size)
 {
-    if(tokenizer->currentToken.tokenType != TEXT && tokenizer->currentToken.tokenType != NUMBER) {
+    if(tokenizer->currentToken.tokenType == NONE)
+    {
         return TOKEN_VALUE_ERROR_INVALID_TOKEN_TYPE;
     }
+
+    if(tokenizer->currentToken.tokenType == NEWLINE)
+    {
+        const char* NEWLINE_STR = "NEWLINE";
+        if(buffer_size < 8) // length of "NEWLINE" + null terminator
+        {
+            return TOKEN_VALUE_ERROR_BUFFER_TOO_SMALL;
+        }
+        snprintf(buffer, buffer_size, "%s", NEWLINE_STR);
+        return TOKEN_VALUE_SUCCESS;
+    }
+
+    if(tokenizer->currentToken.tokenType == INDENTION)
+    {
+        const char* INDENTION_STR = "INDENTION";
+        if(buffer_size < 10) // length of "INDENTION" + null terminator
+        {
+            return TOKEN_VALUE_ERROR_BUFFER_TOO_SMALL;
+        }
+        snprintf(buffer, buffer_size, "%s", INDENTION_STR);
+        return TOKEN_VALUE_SUCCESS;
+    }
+
 
     if(buffer_size < fpmp_token_buffersize(tokenizer)) {
         return TOKEN_VALUE_ERROR_BUFFER_TOO_SMALL;
