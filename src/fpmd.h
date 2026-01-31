@@ -407,9 +407,31 @@ struct FPMD_Parser{
 
 
 
+enum FPMD_ACTION {
+    FPMD_ACTION_DEFAULT,
+    FPMD_ACTION_TOKENIZE
+};
 
-
-void fpmd_convert(FILE* input, FILE* output)
+void fpmd_convert(FILE* input, FILE* output, enum FPMD_ACTION action)
 {
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, input);
 
+    do {
+        fpmd_tokenizer_next(&tokenizer);
+
+        //if(ret != 0) {
+        //    printf("Error reading token: %d\n", ret);
+        //    break;
+        //}
+
+        char buffer[FPMD_MAX_TOKEN_LENGTH];
+        fpmd_token_value(&tokenizer, buffer, FPMD_MAX_TOKEN_LENGTH);
+
+        if(action == FPMD_ACTION_TOKENIZE)
+        {
+            fprintf(output, "Token Type: %d, Value: '%s'\n", tokenizer.currentToken.tokenType, buffer);
+        }
+
+    } while(!feof(input));
 }

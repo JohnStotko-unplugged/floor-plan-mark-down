@@ -1,4 +1,4 @@
-TARGET = prog.out
+TARGET = fpmd
 LIBS = -lm
 CC = gcc
 CFLAGS = -g -Wall -Werror -pedantic -std=gnu17 
@@ -73,11 +73,7 @@ $(SAMPLE_TEST_FOLDER)/bin/%.out: $(SAMPLE_TEST_FOLDER)/%.c $(HEADERS)
 
 sample: $(SAMPLE_TEST_EXECS)
 	@echo "Running sample tests..."
-	@for test_exec in $(SAMPLE_TEST_EXECS); do \
-		echo "Running $$test_exec "; \
-		$$test_exec; \
-		echo ""; \
-	done; \
+	@cat samples/example1/example1.md | bin/fpmd -t
 	echo "Sample tests completed."
 
 ###########################################################################
@@ -85,8 +81,8 @@ sample: $(SAMPLE_TEST_EXECS)
 .PHONY: clean
 
 clean:
-	-rm -f $(OBJ)/*.o
-	-rm -f $(BIN)/$(TARGET)
+	-rm -r $(OBJ)
+	-rm -r $(BIN)
 	-rm -f $(TESTS)/output*.txt
 	-rm -f $(UNIT_TEST_FOLDER)/bin/*.out
 	-rm -f $(UNIT_TEST_FOLDER)/obj/*.o

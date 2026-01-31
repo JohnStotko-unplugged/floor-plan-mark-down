@@ -16,16 +16,15 @@ void printHelp()
     printf("Options:\n");
     printf("  -h, --help    Show this help message\n");
     printf("  -v, --version Show program version\n");
-    printf("  <filename>    Specify input file. If absent, program \n");
-    printf("                will read from standard input\n");
 }
-
 
 
 int main(int argc, char *argv[])
 {
     FILE* fp;
     fp = stdin;
+
+    int action = FPMD_ACTION_DEFAULT;
 
     if(argc == 2)
     {
@@ -43,15 +42,13 @@ int main(int argc, char *argv[])
             return 0;
         }
 
-        fp = fopen(arg, "r");
-        if(fp == NULL)
+        if(strcmp(arg, "-t") == 0)
         {
-            perror("Error opening file");
-            return 1;
+            action = FPMD_ACTION_TOKENIZE;
         }
     }
 
-    fpmd_convert(fp, stdout);
+    fpmd_convert(fp, stdout, action);
     
     if (fp != stdin)
 		(void)fclose(fp);
