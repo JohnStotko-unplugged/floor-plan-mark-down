@@ -62,15 +62,25 @@ test: $(UNIT_TEST_EXECS)
 
 ###########################################################################
 
-perf: $(UNIT_TEST_EXECS)
-	@echo "Running perf stat on unit tests..."
-	@for test_exec in $(UNIT_TEST_EXECS); do \
-        echo "Profiling $$test_exec"; \
-        perf stat $$test_exec; \
-        echo ""; \
-    done
+SAMPLE_TEST_FOLDER = tests/samples
+SAMPLE_TEST_FILES =  $(wildcard $(SAMPLE_TEST_FOLDER)/*.c)
+SAMPLE_TEST_OBJECTS = $(patsubst $(SAMPLE_TEST_FOLDER)/%.c, $(SAMPLE_TEST_FOLDER)/obj/%.o, $(SAMPLE_TEST_FILES))
+SAMPLE_TEST_EXECS = $(patsubst $(SAMPLE_TEST_FOLDER)/%.c, $(SAMPLE_TEST_FOLDER)/bin/%.out, $(SAMPLE_TEST_FILES))
 
+$(SAMPLE_TEST_FOLDER)/bin/%.out: $(SAMPLE_TEST_FOLDER)/%.c
+	@ mkdir -p $(SAMPLE_TEST_FOLDER)/bin
+	$(CC) $(CFLAGS) $< -o $@ $(LIBS)
 
+sample: $(SAMPLE_TEST_EXECS)
+	@echo "Running sample tests..."
+	@for test_exec in $(SAMPLE_TEST_EXECS); do \
+		echo "Running $$test_exec "; \
+		$$test_exec; \
+		echo ""; \
+	done; \
+	echo "Sample tests completed."
+
+###########################################################################
 
 .PHONY: clean
 
@@ -79,3 +89,6 @@ clean:
 	-rm -f $(BIN)/$(TARGET)
 	-rm -f $(TESTS)/output*.txt
 	-rm -f $(UNIT_TEST_FOLDER)/bin/*.out
+	-rm -f $(UNIT_TEST_FOLDER)/obj/*.o
+	-rm -f $(SAMPLE_TEST_FOLDER)/bin/*.out
+	-rm -f $(SAMPLE_TEST_FOLDER)/obj/*.o
