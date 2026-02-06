@@ -39,6 +39,7 @@ enum FPMD_TOKEN_TYPE{
 
 struct FPMD_Token{
     enum FPMD_TOKEN_TYPE tokenType;
+    char token[64];
     int start ;
     int length ;
 };
@@ -68,7 +69,25 @@ struct FPMD_Token fpmd_token_init()
     token.tokenType = NONE;
     token.start = -1;
     token.length = -1;
+
     return token;
+}
+
+void fpmd_token_reset(struct FPMD_Token* token)
+{
+    for(int i = 0; i < FPMD_MAX_TOKEN_LENGTH; i++)
+    {
+        token->token[i] = 0;
+    }
+
+    token->length = 0;
+    token->tokenType = NONE;
+}
+
+void fpmd_token_append(struct FPMD_Token* token, char c)
+{
+    token->length++;
+    token->token[token->length] = c;
 }
 
 void fpmd_tokenizer_init(struct FPMD_Tokenizer* tokenizer, FILE* input)
@@ -233,15 +252,11 @@ void fpmb_tokenizer_move_next_state( struct FPMD_Tokenizer* tokenizer, int c, in
 
 int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 {
-    // Assume that this is the start of a new token
-    tokenizer->currentToken.start = ftell(tokenizer->input);
-    tokenizer->currentToken.length = 0;
-
-    //const int TOKEN_BUFFER_SIZE = 256;
+    struct FPMD_Token* currentToken = &(tokenizer->currentToken);
+    fpmd_token_reset(currentToken);
 
     int c;
-    //char buffer[TOKEN_BUFFER_SIZE];
-    //int bufferPosition = 0;
+    
     do{
         c = fgetc(tokenizer->input);
         
@@ -255,37 +270,35 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 
         if(tokenizer->state == STATE_INDENTION_FINISH)
         {
-            tokenizer->currentToken.tokenType = INDENTION;
-            tokenizer->currentToken.length += 1;
+            currentToken->tokenType = INDENTION;
+            fpmd_token_append(currentToken, c);
             return true;
         }
 
         if(tokenizer->state == STATE_QUOTED_TEXT_START)
         {
             // Skip starting quote
-            tokenizer->currentToken.start += 1;
         }
 
         if(tokenizer->state == STATE_NEWLINE)
         {
             tokenizer->currentToken.tokenType = NEWLINE;
-            tokenizer->currentToken.length += 1;
             return true;
         }
         else if(tokenizer->state == STATE_INDENTION_IN_PROGRESS)
         {
             tokenizer->currentToken.tokenType = INDENTION;
-            tokenizer->currentToken.length += 1;
+            fpmd_token_append(currentToken, c);
         }
         else if(tokenizer->state == STATE_TEXT_IN_PROGRESS)
         {
-            tokenizer->currentToken.tokenType = TEXT;
-            tokenizer->currentToken.length += 1;
+            currentToken->tokenType = TEXT;
+            fpmd_token_append(currentToken, c);
         }
         else if(tokenizer->state == STATE_QUOTED_TEXT_IN_PROGRESS)
         {
-            tokenizer->currentToken.tokenType = TEXT;
-            tokenizer->currentToken.length += 1;
+            currentToken->tokenType = TEXT;
+            fpmd_token_append(currentToken, c);
         }
         else if(tokenizer->state == STATE_SEARCH_FOR_NEXT_TOKEN)
         {
@@ -296,15 +309,13 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             {
                 return true;
             }
-            else{
-                // Continue searching for next token
-                tokenizer->currentToken.start = ftell(tokenizer->input);
-                tokenizer->currentToken.length = 0;
-            }
+            
+            // Continue searching for next token
         }
 
 
     } while (c != EOF );
+
 
     if(tokenizer->previousState == STATE_TEXT_IN_PROGRESS
     || tokenizer->previousState == STATE_INDENTION_IN_PROGRESS)
@@ -358,10 +369,7 @@ int fpmd_token_value(struct FPMD_Tokenizer* tokenizer, char buffer[], int buffer
         return TOKEN_VALUE_ERROR_BUFFER_TOO_SMALL;
     }
 
-    fseek(tokenizer->input, tokenizer->currentToken.start, SEEK_SET);
-    fread(buffer, sizeof(char), tokenizer->currentToken.length, tokenizer->input);
-    buffer[tokenizer->currentToken.length] = '\0';
-
+    memcpy(buffer, tokenizer->currentToken.token, tokenizer->currentToken.length);
     return TOKEN_VALUE_SUCCESS;
 }
 
@@ -419,18 +427,13 @@ void fpmd_convert(FILE* input, FILE* output, enum FPMD_ACTION action)
 
     do {
         fpmd_tokenizer_next(&tokenizer);
-
-        //if(ret != 0) {
-        //    printf("Error reading token: %d\n", ret);
-        //    break;
-        //}
-
-        char buffer[FPMD_MAX_TOKEN_LENGTH];
-        fpmd_token_value(&tokenizer, buffer, FPMD_MAX_TOKEN_LENGTH);
+        int bufferSize = fpmp_token_buffersize(&tokenizer);
+        char buffer[bufferSize];
+        fpmd_token_value(&tokenizer, buffer, bufferSize);
 
         if(action == FPMD_ACTION_TOKENIZE)
         {
-            fprintf(output, "Token Type: %d, Value: '%s'\n", tokenizer.currentToken.tokenType, buffer);
+            fprintf(output, "'%s'\n", buffer);
         }
 
     } while(!feof(input));

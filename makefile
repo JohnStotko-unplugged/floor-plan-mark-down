@@ -43,7 +43,7 @@ UNIT_TEST_EXECS = $(patsubst $(UNIT_TEST_FOLDER)/%.c, $(UNIT_TEST_FOLDER)/bin/%.
 
 $(UNIT_TEST_FOLDER)/bin/%.out: $(UNIT_TEST_FOLDER)/%.c $(HEADERS)
 	@ mkdir -p $(UNIT_TEST_FOLDER)/bin
-	$(CC) $(CFLAGS) $< -o $@ $(LIBS)
+	$(CC) $(CFLAGS) -O0 $< -o $@ $(LIBS)
 
 test: $(UNIT_TEST_EXECS)
 	@echo "Running tests..."

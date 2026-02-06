@@ -372,6 +372,65 @@ int tokenizer_next_token_multiple_newline()
     return test_passed();
 }
 
+int tokenizer_block(){
+    report_test_start("tokenizer_block");
+
+    char *input =
+    "wall exterior\n"
+    "  0 0";
+
+    FILE* in = fmemopen(input, strlen(input), "r");
+
+    struct FPMD_Tokenizer tokenizer;
+    fpmd_tokenizer_init(&tokenizer, in);
+
+    fpmd_tokenizer_next(&tokenizer);
+    int bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer1[bufferSize];
+    fpmd_token_value(&tokenizer, buffer1, bufferSize);
+
+    if(strcmp(buffer1, "wall") != 0)
+    {
+        char msg[256];
+        sprintf(msg, "expected token value 'wall', but got '%s'", buffer1);
+        return test_failed(msg);
+    }
+
+    fpmd_tokenizer_next(&tokenizer);
+    bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer2[bufferSize];
+    fpmd_token_value(&tokenizer, buffer2, bufferSize);
+
+    if(strcmp(buffer1, "exterior") != 0)
+    {
+        char msg[256];
+        sprintf(msg, "expected token value 'exterior', but got '%s'", buffer2);
+        return test_failed(msg);
+    }
+
+    fpmd_tokenizer_next(&tokenizer);
+    bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer3[bufferSize];
+    fpmd_token_value(&tokenizer, buffer3, bufferSize);
+
+    fpmd_tokenizer_next(&tokenizer);
+    bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer4[bufferSize];
+    fpmd_token_value(&tokenizer, buffer4, bufferSize);
+
+    fpmd_tokenizer_next(&tokenizer);
+    bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer5[bufferSize];
+    fpmd_token_value(&tokenizer, buffer5, bufferSize);
+
+    fpmd_tokenizer_next(&tokenizer);
+    bufferSize = fpmp_token_buffersize(&tokenizer);
+    char buffer6[bufferSize];
+    fpmd_token_value(&tokenizer, buffer6, bufferSize);
+
+    return test_passed();
+}
+
 int main() {
     int result = TEST_SUCCESS;
 
@@ -387,6 +446,7 @@ int main() {
     result |= tokenizer_next_token_multiple_indent();
     result |= tokenizer_next_token_newline();
     result |= tokenizer_next_token_multiple_newline();
+    result |= tokenizer_block();
 
     return result;
 }
