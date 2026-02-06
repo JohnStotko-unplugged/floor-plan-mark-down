@@ -40,7 +40,6 @@ enum FPMD_TOKEN_TYPE{
 struct FPMD_Token{
     enum FPMD_TOKEN_TYPE tokenType;
     char token[64];
-    int start ;
     int length ;
 };
 
@@ -67,8 +66,7 @@ struct FPMD_Token fpmd_token_init()
 {
     struct FPMD_Token token;
     token.tokenType = NONE;
-    token.start = -1;
-    token.length = -1;
+    token.length = 0;
 
     return token;
 }

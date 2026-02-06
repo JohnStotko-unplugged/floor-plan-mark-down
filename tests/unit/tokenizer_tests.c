@@ -17,12 +17,8 @@ int tokenizer_initialization_test()
         return test_failed("token type should be initialized to None");
     }
 
-    if(tokenizer.currentToken.start != -1) {
-        return test_failed("token start should be initialized to -1");
-    }
-
-    if(tokenizer.currentToken.length != -1) {
-        return test_failed("token length should be initialized to -1");
+    if(tokenizer.currentToken.length != 0) {
+        return test_failed("token length should be initialized to 0");
     }
 
     return test_passed();
