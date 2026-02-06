@@ -75,7 +75,7 @@ void fpmd_token_reset(struct FPMD_Token* token)
 {
     for(int i = 0; i < FPMD_MAX_TOKEN_LENGTH; i++)
     {
-        token->token[i] = 0;
+        token->token[i] = '\0';
     }
 
     token->length = 0;
@@ -84,8 +84,8 @@ void fpmd_token_reset(struct FPMD_Token* token)
 
 void fpmd_token_append(struct FPMD_Token* token, char c)
 {
-    token->length++;
     token->token[token->length] = c;
+    token->length++;
 }
 
 void fpmd_tokenizer_init(struct FPMD_Tokenizer* tokenizer, FILE* input)
@@ -367,7 +367,8 @@ int fpmd_token_value(struct FPMD_Tokenizer* tokenizer, char buffer[], int buffer
         return TOKEN_VALUE_ERROR_BUFFER_TOO_SMALL;
     }
 
-    memcpy(buffer, tokenizer->currentToken.token, tokenizer->currentToken.length);
+    memcpy(buffer, tokenizer->currentToken.token, tokenizer->currentToken.length + 1);
+
     return TOKEN_VALUE_SUCCESS;
 }
 
