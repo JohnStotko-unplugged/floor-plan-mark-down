@@ -340,29 +340,6 @@ int fpmd_token_value(struct FPMD_Tokenizer* tokenizer, char buffer[], int buffer
         return TOKEN_VALUE_ERROR_INVALID_TOKEN_TYPE;
     }
 
-    if(tokenizer->currentToken.tokenType == NEWLINE)
-    {
-        const char* NEWLINE_STR = "NEWLINE";
-        if(buffer_size < 8) // length of "NEWLINE" + null terminator
-        {
-            return TOKEN_VALUE_ERROR_BUFFER_TOO_SMALL;
-        }
-        snprintf(buffer, buffer_size, "%s", NEWLINE_STR);
-        return TOKEN_VALUE_SUCCESS;
-    }
-
-    if(tokenizer->currentToken.tokenType == INDENTION)
-    {
-        const char* INDENTION_STR = "INDENTION";
-        if(buffer_size < 10) // length of "INDENTION" + null terminator
-        {
-            return TOKEN_VALUE_ERROR_BUFFER_TOO_SMALL;
-        }
-        snprintf(buffer, buffer_size, "%s", INDENTION_STR);
-        return TOKEN_VALUE_SUCCESS;
-    }
-
-
     if(buffer_size < fpmp_token_buffersize(tokenizer)) {
         return TOKEN_VALUE_ERROR_BUFFER_TOO_SMALL;
     }
@@ -426,18 +403,20 @@ void fpmd_convert(FILE* input, FILE* output, enum FPMD_ACTION action)
 
     do {
         fpmd_tokenizer_next(&tokenizer);
-        char buffer[FPMD_MAX_TOKEN_LENGTH];
-        fpmd_token_value(&tokenizer, buffer, FPMD_MAX_TOKEN_LENGTH);
 
         if(action == FPMD_ACTION_TOKENIZE)
         {
             if(tokenizer.currentToken.tokenType == NEWLINE)
             {
-                fprintf(output, "\n\n");
+                fprintf(output, "</br>\n");
+            }
+            else if(tokenizer.currentToken.tokenType == INDENTION)
+            {
+                fprintf(output, "`->`  ");
             }
             else
             {
-                fprintf(output, "`%s`  ", buffer);
+                fprintf(output, "`%s`  ", tokenizer.currentToken.token);
             }
         }
 
