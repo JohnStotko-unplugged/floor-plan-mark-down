@@ -64,7 +64,7 @@ test: $(UNIT_TEST_EXECS)
 
 sample: $(BIN)/$(TARGET)
 	@echo "Running sample tests..."
-	@cat samples/example1/example1.md | bin/fpmd -t
+	@cat samples/example1/example1.md | bin/fpmd -t > samples/example1/example1-token.md
 	echo "Sample tests completed."
 
 ###########################################################################

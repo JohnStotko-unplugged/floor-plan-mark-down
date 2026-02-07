@@ -426,13 +426,19 @@ void fpmd_convert(FILE* input, FILE* output, enum FPMD_ACTION action)
 
     do {
         fpmd_tokenizer_next(&tokenizer);
-        int bufferSize = fpmp_token_buffersize(&tokenizer);
-        char buffer[bufferSize];
-        fpmd_token_value(&tokenizer, buffer, bufferSize);
+        char buffer[FPMD_MAX_TOKEN_LENGTH];
+        fpmd_token_value(&tokenizer, buffer, FPMD_MAX_TOKEN_LENGTH);
 
         if(action == FPMD_ACTION_TOKENIZE)
         {
-            fprintf(output, "'%s'\n", buffer);
+            if(tokenizer.currentToken.tokenType == NEWLINE)
+            {
+                fprintf(output, "\n\n");
+            }
+            else
+            {
+                fprintf(output, "`%s`  ", buffer);
+            }
         }
 
     } while(!feof(input));
