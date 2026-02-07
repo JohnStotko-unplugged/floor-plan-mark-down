@@ -385,29 +385,23 @@ int tokenizer_block(){
     char buffer1[bufferSize];
     fpmd_token_value(&tokenizer, buffer1, bufferSize);
 
-    if(strcmp(buffer1, "wall") != 0)
-    {
-        char msg[256];
-        sprintf(msg, "expected token value 'wall', but got '%s'", buffer1);
-        return test_failed(msg);
-    }
+    if(test_string(buffer1, "wall") != TEST_SUCCESS)
+        return TEST_FAILURE; 
 
     fpmd_tokenizer_next(&tokenizer);
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer2[bufferSize];
     fpmd_token_value(&tokenizer, buffer2, bufferSize);
 
-    if(strcmp(buffer1, "exterior") != 0)
-    {
-        char msg[256];
-        sprintf(msg, "expected token value 'exterior', but got '%s'", buffer2);
-        return test_failed(msg);
-    }
+    if(test_string(buffer2, "exterior") != TEST_SUCCESS)
+        return TEST_FAILURE;
 
     fpmd_tokenizer_next(&tokenizer);
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer3[bufferSize];
     fpmd_token_value(&tokenizer, buffer3, bufferSize);
+
+    
 
     fpmd_tokenizer_next(&tokenizer);
     bufferSize = fpmp_token_buffersize(&tokenizer);
@@ -423,6 +417,7 @@ int tokenizer_block(){
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer6[bufferSize];
     fpmd_token_value(&tokenizer, buffer6, bufferSize);
+
 
     return test_passed();
 }

@@ -39,3 +39,15 @@ int test_todo()
     printf("%sTO-DO%s\n", COLOR_MAGENTA, COLOR_NORMAL);
     return TEST_SUCCESS;
 }
+
+int test_string(char* actual, char* expected)
+{
+    if(strcmp(actual, expected) != 0)
+    {
+        char msg[256];
+        sprintf(msg, "expected token value '%s', but got '%s'", expected, actual);
+        return test_failed(msg);
+    }
+
+    return TEST_SUCCESS;
+}
