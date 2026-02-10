@@ -189,7 +189,11 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
             }
             break;
         case STATE_TEXT_IN_PROGRESS:
-            if(fpmd_tokenizer_is_text(c))
+            if(fpmd_tokenizer_is_newline(c))
+            {
+                return STATE_NEWLINE;
+            }
+            else if(fpmd_tokenizer_is_text(c))
             {
                 return STATE_TEXT_IN_PROGRESS;
             }
@@ -252,7 +256,7 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 {
     struct FPMD_Token* currentToken = &(tokenizer->currentToken);
     fpmd_token_reset(currentToken);
-
+    
     int c;
     
     do{
@@ -281,6 +285,7 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
         if(tokenizer->state == STATE_NEWLINE)
         {
             tokenizer->currentToken.tokenType = NEWLINE;
+            fpmd_token_append(currentToken, c);
             return true;
         }
         else if(tokenizer->state == STATE_INDENTION_IN_PROGRESS)
