@@ -401,22 +401,32 @@ int tokenizer_block(){
     char buffer3[bufferSize];
     fpmd_token_value(&tokenizer, buffer3, bufferSize);
 
-    
+    if(test_string(buffer3, "NEWLINE") != TEST_SUCCESS)
+        return TEST_FAILURE;
 
     fpmd_tokenizer_next(&tokenizer);
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer4[bufferSize];
     fpmd_token_value(&tokenizer, buffer4, bufferSize);
 
+    if(test_string(buffer4, "INDENTION") != TEST_SUCCESS)
+        return TEST_FAILURE;
+
     fpmd_tokenizer_next(&tokenizer);
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer5[bufferSize];
     fpmd_token_value(&tokenizer, buffer5, bufferSize);
 
+    if(test_string(buffer5, "0") != TEST_SUCCESS)
+        return TEST_FAILURE;
+
     fpmd_tokenizer_next(&tokenizer);
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer6[bufferSize];
     fpmd_token_value(&tokenizer, buffer6, bufferSize);
+
+    if(test_string(buffer6, "0") != TEST_SUCCESS)
+        return TEST_FAILURE;
 
 
     return test_passed();
