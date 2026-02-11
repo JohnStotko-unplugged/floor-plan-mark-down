@@ -301,20 +301,18 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
     int c;
     
     do{
-        c = fgetc(tokenizer->input);
         int error = 0;
+        int advance = 0; // if 0, then unget from stream
+        int append = 0; // if 0, then do not append to token
+        int finish = 0; // if 0, then continue collecting token
 
+        c = fgetc(tokenizer->input);
         enum FPMD_Tokenizer_State nextState = fpmb_tokenizer_get_next_state(tokenizer, c, &error);
-        //fpmb_tokenizer_move_next_state(tokenizer, c, &error);
 
         if(nextState == STATE_ERROR)
         {
             return error; // TODO return error code
         }
-
-        int advance = 0; // if 0, then unget from stream
-        int append = 0; // if 0, then do not append to token
-        int finish = 0; // if 0, then continue collecting token
 
         if(nextState == STATE_INDENTION_FINISH)
         {
