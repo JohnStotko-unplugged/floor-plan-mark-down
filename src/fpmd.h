@@ -302,68 +302,62 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
     
     do{
         int error = 0;
-        int advance = 0; // if 0, then unget from stream
+        int advance = 1; // if 0, then unget from stream
         int append = 0; // if 0, then do not append to token
         int finish = 0; // if 0, then continue collecting token
 
         c = fgetc(tokenizer->input);
         enum FPMD_Tokenizer_State nextState = fpmb_tokenizer_get_next_state(tokenizer, c, &error);
 
-        if(nextState == STATE_ERROR)
+        switch (nextState)
         {
-            return error; // TODO return error code
-        }
-
-        if(nextState == STATE_INDENTION_FINISH)
-        {
+        case STATE_ERROR:
+            return error;
+        case STATE_INDENTION_FINISH:
             currentToken->tokenType = INDENTION;
-            advance = 1;
-            finish = 1;
-        }
-
-        if(nextState == STATE_QUOTED_TEXT_START)
-        {
-            advance = 1;
-        }
-
-        if(nextState == STATE_NEWLINE)
-        {
+            finish = 1; 
+            break;    
+        case STATE_QUOTED_TEXT_START:
+            currentToken->tokenType = TEXT;
+            break;
+        case STATE_NEWLINE:
             tokenizer->currentToken.tokenType = NEWLINE;
-            append = 1;
-            finish = 1;
-        }
-        else if(nextState == STATE_INDENTION_IN_PROGRESS)
-        {
-            tokenizer->currentToken.tokenType = INDENTION;
-            append = 1;
-            advance = 1;
-        }
-        else if(nextState == STATE_TEXT_IN_PROGRESS)
-        {
-            currentToken->tokenType = TEXT;
-            append = 1;
-            advance = 1;
-        }
-        else if(nextState == STATE_QUOTED_TEXT_IN_PROGRESS)
-        {
-            currentToken->tokenType = TEXT;
-            append = 1;
-            advance = 1;
-        }
-        else if(nextState == STATE_SEARCH_FOR_NEXT_TOKEN)
-        {
-            // Finalize token
+
             if(tokenizer->previousState == STATE_INDENTION_IN_PROGRESS
             || tokenizer->previousState == STATE_TEXT_IN_PROGRESS
             || tokenizer->previousState == STATE_QUOTED_TEXT_IN_PROGRESS)
             {
-                advance = 1;
+                advance = 0;
                 finish = 1;
             }
             else
             {
-                advance = 1;
+                append = 1;
+                finish = 1;
             }
+            break;
+        case STATE_INDENTION_IN_PROGRESS:
+            tokenizer->currentToken.tokenType = INDENTION;
+            append = 1;
+            break;
+        case STATE_TEXT_IN_PROGRESS:
+            currentToken->tokenType = TEXT;
+            append = 1;
+            break;
+        case STATE_QUOTED_TEXT_IN_PROGRESS:
+            currentToken->tokenType = TEXT;
+            append = 1;
+            break;
+        case STATE_SEARCH_FOR_NEXT_TOKEN:
+            if(tokenizer->previousState == STATE_INDENTION_IN_PROGRESS
+            || tokenizer->previousState == STATE_TEXT_IN_PROGRESS
+            || tokenizer->previousState == STATE_QUOTED_TEXT_IN_PROGRESS)
+            {
+                finish = 1;
+            }
+            break;
+        default:
+            break;
         }
 
         if(append)
@@ -383,6 +377,8 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 
         if(finish)
         {
+            tokenizer->previousState = tokenizer->state;
+            tokenizer->state = nextState;
             return true;
         }
 
