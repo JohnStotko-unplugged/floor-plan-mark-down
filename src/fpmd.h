@@ -126,124 +126,145 @@ bool fpmd_tokenizer_is_newline(int c)
     return c == '\n';
 }
 
+enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state_newline(int c, int* error)
+{
+    if(fpmd_tokenizer_is_space(c))
+    {
+        return STATE_INDENTION_IN_PROGRESS;
+    }
+    else if(fpmd_tokenizer_is_text(c))
+    {
+        return STATE_TEXT_IN_PROGRESS;
+    }
+    else if(fpmd_tokenizer_is_singlequote(c))
+    {
+        return STATE_QUOTED_TEXT_START;
+    }
+    else if(fpmd_tokenizer_is_newline(c))
+    {
+        return STATE_NEWLINE;
+    }
+    else
+    {
+        *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_NEWLINE;
+        return STATE_EOF;
+    }
+}
+
+enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state_search(int c, int* error)
+{
+    if(fpmd_tokenizer_is_space(c))
+    {
+        return STATE_SEARCH_FOR_NEXT_TOKEN;
+    }
+    else if(fpmd_tokenizer_is_text(c))
+    {
+        return STATE_TEXT_IN_PROGRESS;
+    }
+    else if(fpmd_tokenizer_is_singlequote(c))
+    {
+        return STATE_QUOTED_TEXT_START;
+    }
+    else if(fpmd_tokenizer_is_newline(c))
+    {
+        return STATE_NEWLINE;
+    }
+    else
+    {
+        *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_NEWLINE;
+        return STATE_EOF;
+    }
+}
+
+enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state_indention_ip(int c, int* error)
+{
+    if(fpmd_tokenizer_is_space(c))
+    {
+        return STATE_INDENTION_FINISH;
+    }
+    else 
+    {
+        *error = FPMD_TOKENIZER_ERROR_EXPECTED_WHITESPACE;
+        return STATE_ERROR;
+    }
+}
+
+enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state_text_ip(int c, int* error)
+{
+    if(fpmd_tokenizer_is_newline(c))
+    {
+        return STATE_NEWLINE;
+    }
+    else if(fpmd_tokenizer_is_text(c))
+    {
+        return STATE_TEXT_IN_PROGRESS;
+    }
+    else if (fpmd_tokenizer_is_space(c) || fpmd_tokenizer_is_newline(c))
+    {
+        return STATE_SEARCH_FOR_NEXT_TOKEN;
+    }
+    else{
+        *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_TEXT;
+        return STATE_EOF;
+    }
+}
+
+enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state_qtext_start(int c, int* error)
+{
+    if(fpmd_tokenizer_is_qtext(c))
+    {
+        return STATE_QUOTED_TEXT_IN_PROGRESS;
+    }
+    else if(fpmd_tokenizer_is_singlequote(c))
+    {
+        return STATE_SEARCH_FOR_NEXT_TOKEN;
+    }
+    else
+    {
+        *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_QUOTED_TEXT;
+        return STATE_ERROR;
+    }
+}
+
+enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state_qtext_ip(int c, int* error)
+{
+    if(fpmd_tokenizer_is_qtext(c))
+    {
+        return STATE_QUOTED_TEXT_IN_PROGRESS;
+    }
+    else if(fpmd_tokenizer_is_singlequote(c))
+    {
+        return STATE_SEARCH_FOR_NEXT_TOKEN;
+    }
+    else
+    {
+        *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_QUOTED_TEXT;
+        return STATE_ERROR;
+    }
+}
+
 enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokenizer* tokenizer, int c, int* error)
 {
     switch(tokenizer->state)
     {
         case STATE_NEWLINE:
         case STATE_INDENTION_FINISH:
-            if(fpmd_tokenizer_is_space(c))
-            {
-                return STATE_INDENTION_IN_PROGRESS;
-            }
-            else if(fpmd_tokenizer_is_text(c))
-            {
-                return STATE_TEXT_IN_PROGRESS;
-            }
-            else if(fpmd_tokenizer_is_singlequote(c))
-            {
-                return STATE_QUOTED_TEXT_START;
-            }
-            else if(fpmd_tokenizer_is_newline(c))
-            {
-                return STATE_NEWLINE;
-            }
-            else
-            {
-                *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_NEWLINE;
-                return STATE_EOF;
-            }
-            break;
+            return fpmb_tokenizer_get_next_state_newline(c, error);
         case STATE_SEARCH_FOR_NEXT_TOKEN:
-            if(fpmd_tokenizer_is_space(c))
-            {
-                return STATE_SEARCH_FOR_NEXT_TOKEN;
-            }
-            else if(fpmd_tokenizer_is_text(c))
-            {
-                return STATE_TEXT_IN_PROGRESS;
-            }
-            else if(fpmd_tokenizer_is_singlequote(c))
-            {
-                return STATE_QUOTED_TEXT_START;
-            }
-            else if(fpmd_tokenizer_is_newline(c))
-            {
-                return STATE_NEWLINE;
-            }
-            else
-            {
-                *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_NEWLINE;
-                return STATE_EOF;
-            }
-            break;
+            return fpmb_tokenizer_get_next_state_search(c, error);
         case STATE_INDENTION_IN_PROGRESS:
-            if(fpmd_tokenizer_is_space(c))
-            {
-                return STATE_INDENTION_FINISH;
-            }
-            else 
-            {
-                *error = FPMD_TOKENIZER_ERROR_EXPECTED_WHITESPACE;
-                return STATE_ERROR;
-            }
-            break;
+            return fpmb_tokenizer_get_next_state_indention_ip(c, error);
         case STATE_TEXT_IN_PROGRESS:
-            if(fpmd_tokenizer_is_newline(c))
-            {
-                return STATE_NEWLINE;
-            }
-            else if(fpmd_tokenizer_is_text(c))
-            {
-                return STATE_TEXT_IN_PROGRESS;
-            }
-            else if (fpmd_tokenizer_is_space(c) || fpmd_tokenizer_is_newline(c))
-            {
-                return STATE_SEARCH_FOR_NEXT_TOKEN;
-            }
-            else{
-                *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_TEXT;
-                return STATE_EOF;
-            }
-            break;
+            return fpmb_tokenizer_get_next_state_text_ip(c, error);
         case STATE_QUOTED_TEXT_START:
-            if(fpmd_tokenizer_is_qtext(c))
-            {
-                return STATE_QUOTED_TEXT_IN_PROGRESS;
-            }
-            else if(fpmd_tokenizer_is_singlequote(c))
-            {
-                return STATE_SEARCH_FOR_NEXT_TOKEN;
-            }
-            else
-            {
-                *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_QUOTED_TEXT;
-                return STATE_ERROR;
-            }
-            break;
-
+            return fpmb_tokenizer_get_next_state_qtext_start(c, error);
         case STATE_QUOTED_TEXT_IN_PROGRESS:
-            if(fpmd_tokenizer_is_qtext(c))
-            {
-                return STATE_QUOTED_TEXT_IN_PROGRESS;
-            }
-            else if(fpmd_tokenizer_is_singlequote(c))
-            {
-                return STATE_SEARCH_FOR_NEXT_TOKEN;
-            }
-            else
-            {
-                *error = FPMD_TOKENIZER_ERROR_UNEXPECTED_CHARACTER_AFTER_QUOTED_TEXT;
-                return STATE_ERROR;
-            }
-            break;
-
+            return fpmb_tokenizer_get_next_state_qtext_ip(c, error);
         default:
             break;
     }
 
     return STATE_SEARCH_FOR_NEXT_TOKEN;
- 
 }
 
 void fpmb_tokenizer_move_next_state( struct FPMD_Tokenizer* tokenizer, int c, int* error)
@@ -254,6 +275,26 @@ void fpmb_tokenizer_move_next_state( struct FPMD_Tokenizer* tokenizer, int c, in
 
 int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 {
+    /*
+    
+    Current flaw in logic... consider
+    
+    abc\n
+    
+    after reading 'c', the tokenizer moves to the NEWLINE state
+    without finishing the abc token.
+
+    The tokenizer always reads the next character when moving next, 
+    so after reading '\n', it would need to  
+
+    1) Finish the current token `abc`
+    2) Remember it was still on `\n` when next is called again
+
+    For this, I think the tokenizer needs to remember 2 characters
+    - the previous character, and the current one.
+
+    */
+
     struct FPMD_Token* currentToken = &(tokenizer->currentToken);
     fpmd_token_reset(currentToken);
     
