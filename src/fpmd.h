@@ -46,11 +46,11 @@ struct FPMD_Token{
 enum FPMD_Tokenizer_State{
     STATE_EOF,
     STATE_NEWLINE,
-    STATE_QUOTED_TEXT_START,
     STATE_INDENTION_IN_PROGRESS,
-    STATE_TEXT_IN_PROGRESS,
-    STATE_QUOTED_TEXT_IN_PROGRESS,
     STATE_INDENTION_FINISH, 
+    STATE_TEXT_IN_PROGRESS,
+    STATE_QUOTED_TEXT_START,
+    STATE_QUOTED_TEXT_IN_PROGRESS,
     STATE_SEARCH_FOR_NEXT_TOKEN,
     STATE_ERROR
 };
@@ -260,11 +260,11 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
             return fpmb_tokenizer_get_next_state_qtext_start(c, error);
         case STATE_QUOTED_TEXT_IN_PROGRESS:
             return fpmb_tokenizer_get_next_state_qtext_ip(c, error);
+        case STATE_EOF:
+            return STATE_EOF;
         default:
-            break;
+            return STATE_ERROR;
     }
-
-    return STATE_SEARCH_FOR_NEXT_TOKEN;
 }
 
 void fpmb_tokenizer_move_next_state( struct FPMD_Tokenizer* tokenizer, int c, int* error)
