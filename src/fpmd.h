@@ -11,7 +11,7 @@ Module FPBM - FloorPlan MarkDown
 #include <stdarg.h>
 
 
-#define ENABLE_LOGGING
+//#define ENABLE_LOGGING
 
 void log_msg(const char *fmt, ...)
 {
