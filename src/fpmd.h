@@ -8,6 +8,22 @@ Module FPBM - FloorPlan MarkDown
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdarg.h>
+
+
+#define ENABLE_LOGGING
+
+void log_msg(const char *fmt, ...)
+{
+#ifdef ENABLE_LOGGING
+    va_list args;
+    va_start(args, fmt);
+    vprintf(fmt, args);   // the v* family takes a va_list
+    va_end(args);
+#endif
+}
+
+
 
 //############################################################################
 //# START OF ERRORS
@@ -57,7 +73,6 @@ enum FPMD_Tokenizer_State{
 
 struct FPMD_Tokenizer{
     FILE* input;
-    enum FPMD_Tokenizer_State state;
     enum FPMD_Tokenizer_State previousState;
     struct FPMD_Token currentToken;
 };
@@ -91,7 +106,6 @@ void fpmd_token_append(struct FPMD_Token* token, char c)
 void fpmd_tokenizer_init(struct FPMD_Tokenizer* tokenizer, FILE* input)
 {
     tokenizer->input = input;
-    tokenizer->state = STATE_NEWLINE;
     tokenizer->previousState = STATE_NEWLINE;
     tokenizer->currentToken = fpmd_token_init();
 }
@@ -243,9 +257,9 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state_qtext_ip(int c, int* err
     }
 }
 
-enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokenizer* tokenizer, int c, int* error)
+enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const enum FPMD_Tokenizer_State previousState, int c, int* error)
 {
-    switch(tokenizer->state)
+    switch(previousState)
     {
         case STATE_NEWLINE:
         case STATE_INDENTION_FINISH:
@@ -265,12 +279,6 @@ enum FPMD_Tokenizer_State fpmb_tokenizer_get_next_state(const struct FPMD_Tokeni
         default:
             return STATE_ERROR;
     }
-}
-
-void fpmb_tokenizer_move_next_state( struct FPMD_Tokenizer* tokenizer, int c, int* error)
-{
-    tokenizer->previousState = tokenizer->state;
-    tokenizer->state = fpmb_tokenizer_get_next_state(tokenizer, c, error);
 }
 
 int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
@@ -297,9 +305,9 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
 
     struct FPMD_Token* currentToken = &(tokenizer->currentToken);
     fpmd_token_reset(currentToken);
-    
+    log_msg("\n");
     int c;
-    
+
     do{
         int error = 0;
         int advance = 1; // if 0, then unget from stream
@@ -307,8 +315,8 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
         int finish = 0; // if 0, then continue collecting token
 
         c = fgetc(tokenizer->input);
-        enum FPMD_Tokenizer_State nextState = fpmb_tokenizer_get_next_state(tokenizer, c, &error);
 
+        enum FPMD_Tokenizer_State nextState = fpmb_tokenizer_get_next_state(tokenizer->previousState, c, &error);
         switch (nextState)
         {
         case STATE_ERROR:
@@ -360,25 +368,26 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             break;
         }
 
+        log_msg("Char: %c NS: %d PS: %d ap: %d ad: %d fi: %d\n", c, nextState, tokenizer->previousState, append, advance, finish);
+
+
         if(append)
         {
             fpmd_token_append(currentToken, c);
         }
 
-        if(advance)
-        {
-            tokenizer->previousState = tokenizer->state;
-            tokenizer->state = nextState;
-        }
-        else
+        if(!advance)
         {
             ungetc(c, tokenizer->input);
         }
 
+        if(finish > 0 || advance > 0)
+        {
+            tokenizer->previousState = nextState;
+        }
+
         if(finish)
         {
-            tokenizer->previousState = tokenizer->state;
-            tokenizer->state = nextState;
             return true;
         }
 
@@ -478,7 +487,7 @@ void fpmd_convert(FILE* input, FILE* output, enum FPMD_ACTION action)
         {
             if(tokenizer.currentToken.tokenType == NEWLINE)
             {
-                fprintf(output, "</br>\n");
+                fprintf(output, "\n");
             }
             else if(tokenizer.currentToken.tokenType == INDENTION)
             {

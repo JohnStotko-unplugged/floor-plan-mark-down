@@ -401,7 +401,7 @@ int tokenizer_block(){
     char buffer3[bufferSize];
     fpmd_token_value(&tokenizer, buffer3, bufferSize);
 
-    if(test_string(buffer3, "/n") != TEST_SUCCESS)
+    if(test_string(buffer3, "\n") != TEST_SUCCESS)
         return TEST_FAILURE;
 
     fpmd_tokenizer_next(&tokenizer);
