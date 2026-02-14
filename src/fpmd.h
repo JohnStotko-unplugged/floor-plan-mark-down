@@ -323,6 +323,7 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             return error;
         case STATE_INDENTION_FINISH:
             currentToken->tokenType = INDENTION;
+            append = 1;
             finish = 1; 
             break;    
         case STATE_QUOTED_TEXT_START:
