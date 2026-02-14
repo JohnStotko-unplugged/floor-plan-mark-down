@@ -365,12 +365,18 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
                 finish = 1;
             }
             break;
+        case STATE_EOF:
+            if(tokenizer->previousState == STATE_TEXT_IN_PROGRESS
+            || tokenizer->previousState == STATE_INDENTION_IN_PROGRESS)
+            {
+                finish = 1;
+                // if quoted test not closed, error should be raised
+            }
         default:
             break;
         }
 
         log_msg("Char: %c NS: %d PS: %d ap: %d ad: %d fi: %d\n", c, nextState, tokenizer->previousState, append, advance, finish);
-
 
         if(append)
         {
@@ -393,13 +399,6 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
         }
 
     } while (c != EOF );
-
-
-    if(tokenizer->previousState == STATE_TEXT_IN_PROGRESS
-    || tokenizer->previousState == STATE_INDENTION_IN_PROGRESS)
-    {
-        return true; // if quoted test not closed, error should be raised
-    }
 
     return false;
 }
