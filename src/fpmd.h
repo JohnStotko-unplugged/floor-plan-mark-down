@@ -304,6 +304,7 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
     */
 
     struct FPMD_Token* currentToken = &(tokenizer->currentToken);
+    log_msg("reset");
     fpmd_token_reset(currentToken);
     log_msg("\n");
     int c;
@@ -330,7 +331,6 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             currentToken->tokenType = TEXT;
             break;
         case STATE_NEWLINE:
-            tokenizer->currentToken.tokenType = NEWLINE;
 
             if(tokenizer->previousState == STATE_INDENTION_IN_PROGRESS
             || tokenizer->previousState == STATE_TEXT_IN_PROGRESS
@@ -341,6 +341,7 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             }
             else
             {
+                tokenizer->currentToken.tokenType = NEWLINE;
                 append = 1;
                 finish = 1;
             }
@@ -376,7 +377,7 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             break;
         }
 
-        log_msg("Char: %c NS: %d PS: %d ap: %d ad: %d fi: %d\n", c, nextState, tokenizer->previousState, append, advance, finish);
+        log_msg("Char: %c NS: %d PS: %d ap: %d ad: %d fi: %d TL: %d\n", c, nextState, tokenizer->previousState, append, advance, finish, tokenizer->currentToken.length);
 
         if(append)
         {
@@ -393,10 +394,14 @@ int fpmd_tokenizer_next(struct FPMD_Tokenizer* tokenizer)
             tokenizer->previousState = nextState;
         }
 
+        log_msg("Char: %c NS: %d PS: %d ap: %d ad: %d fi: %d TL: %d\n", c, nextState, tokenizer->previousState, append, advance, finish, tokenizer->currentToken.length);
+
         if(finish)
         {
+            log_msg("Finish\n");
             return true;
         }
+
 
     } while (c != EOF );
 

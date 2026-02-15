@@ -381,6 +381,10 @@ int tokenizer_block(){
     fpmd_tokenizer_init(&tokenizer, in);
 
     fpmd_tokenizer_next(&tokenizer);
+
+    if(tokenizer.currentToken.tokenType != TEXT)
+        return test_failed("expected token type TEXT");
+
     int bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer1[bufferSize];
     fpmd_token_value(&tokenizer, buffer1, bufferSize);
@@ -389,6 +393,10 @@ int tokenizer_block(){
         return TEST_FAILURE; 
 
     fpmd_tokenizer_next(&tokenizer);
+
+    if(tokenizer.currentToken.tokenType != TEXT)
+        return test_failed("expected token type TEXT");
+
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer2[bufferSize];
     fpmd_token_value(&tokenizer, buffer2, bufferSize);
@@ -397,6 +405,10 @@ int tokenizer_block(){
         return TEST_FAILURE;
 
     fpmd_tokenizer_next(&tokenizer);
+
+    if(tokenizer.currentToken.tokenType != NEWLINE)
+        return test_failed("expected token type NEWLINE");
+
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer3[bufferSize];
     fpmd_token_value(&tokenizer, buffer3, bufferSize);
@@ -405,6 +417,10 @@ int tokenizer_block(){
         return TEST_FAILURE;
 
     fpmd_tokenizer_next(&tokenizer);
+
+    if(tokenizer.currentToken.tokenType != INDENTION)
+        return test_failed("expected token type INDENTION");
+
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer4[bufferSize];
     fpmd_token_value(&tokenizer, buffer4, bufferSize);
@@ -413,6 +429,10 @@ int tokenizer_block(){
         return TEST_FAILURE;
 
     fpmd_tokenizer_next(&tokenizer);
+
+    if(tokenizer.currentToken.tokenType != TEXT)
+        return test_failed("expected token type TEXT");
+
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer5[bufferSize];
     fpmd_token_value(&tokenizer, buffer5, bufferSize);
@@ -421,6 +441,10 @@ int tokenizer_block(){
         return TEST_FAILURE;
 
     fpmd_tokenizer_next(&tokenizer);
+
+    if(tokenizer.currentToken.tokenType != TEXT)
+        return test_failed("expected token type TEXT");
+        
     bufferSize = fpmp_token_buffersize(&tokenizer);
     char buffer6[bufferSize];
     fpmd_token_value(&tokenizer, buffer6, bufferSize);
